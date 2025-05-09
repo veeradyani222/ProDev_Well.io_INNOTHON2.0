@@ -20,7 +20,7 @@ export default function SignIn() {
     setError(null);
 
     try {
-      const response = await fetch('https://doord.onrender.com/login', {
+      const response = await fetch('https://wellio-backend.onrender.com/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -45,10 +45,10 @@ export default function SignIn() {
           Not a member yet? <Link href="/signup">Join Now</Link>
         </div>
       </div>
-      
+
       <div className='signup-container'>
         <div className='signupheads'>
-          <div className='head1'>WELCOME BACK EXCLUSIVE MEMBER</div>
+          <div className='head1'>WELCOME BACK</div>
           <div className='head2'>Sign in to continue</div>
         </div>
 
@@ -61,9 +61,9 @@ export default function SignIn() {
             <label>Password</label>
             <input type="password" name="password" value={formData.password} onChange={handleChange} required />
           </div>
-          
+
           <button className="signinbtn" type="submit"> <div> Proceed to my Account</div>
-          <Image src={Arrow} alt="Go" className="social-icon" width={40} height={40} /> </button>
+            <Image src={Arrow} alt="Go" className="social-icon" width={40} height={40} /> </button>
         </form>
 
         <div className='oruseconts'><div className='oruse'> OR USE </div></div>

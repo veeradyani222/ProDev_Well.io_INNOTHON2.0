@@ -107,7 +107,7 @@ const Users = mongoose.model('Users', new mongoose.Schema({
     password: { type: String, required: true },
     status: { type: String, required: true },
     image_code: { type: String, required: true },
-    doctor: { type: String, required:true},
+    doctor: { type: String, required: true },
     address: { type: String, required: true },
     date: { type: Date, default: Date.now }
 }));
@@ -154,11 +154,11 @@ app.post('/signup', async (req, res) => {
             },
         });
 
-      await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: 'Welcome to Wellio – Verify Your Email',
-    html: `
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Welcome to Wellio – Verify Your Email',
+            html: `
         <html>
             <body style="background-color: #1d3c34; color: white; font-family: Arial, sans-serif; padding: 20px;">
                 <h1 style="color: #4CAF50;">Welcome to Wellio, ${name}!</h1>
@@ -172,7 +172,7 @@ app.post('/signup', async (req, res) => {
             </body>
         </html>
     `
-});
+        });
 
 
         res.json({ success: true, message: "Please verify your email address." });
@@ -250,7 +250,7 @@ const fetchUser = async (req, res, next) => {
 
         // Verify token
         const decoded = jwt.verify(token, 'secret_ecom');
-        
+
         // Get user from database
         const user = await Users.findById(decoded.user.id).select('-password');
         if (!user) {
@@ -290,11 +290,11 @@ app.post("/forgot-password", async (req, res) => {
             auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
         });
 
-       await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "Well.io Password Reset Code",
-    html: `
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "Well.io Password Reset Code",
+            html: `
         <html>
             <body style="background-color: #f4f4f4; font-family: Arial, sans-serif; padding: 20px; color: #333;">
                 <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
@@ -309,7 +309,7 @@ app.post("/forgot-password", async (req, res) => {
             </body>
         </html>
     `
-});
+        });
         res.json({ success: true, message: "OTP sent to email", resetToken });
 
     } catch (error) {
