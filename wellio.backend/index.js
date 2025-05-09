@@ -115,10 +115,10 @@ const pendingVerifications = {}; // Store pending email verifications
 
 app.post('/signup', async (req, res) => {
     try {
-        const { name, email, password, status, image_code, doctor, address } = req.body;
+        const { name, email, password,  doctor, address } = req.body;
 
         // Validate input
-        if (!name || !email || !password || !status || !image_code || !address) {
+        if (!name || !email || !password ||  !doctor|| !address) {
             return res.status(400).json({ success: false, errors: "All fields are required." });
         }
 

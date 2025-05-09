@@ -11,8 +11,6 @@ export default function Signup() {
     name: '',
     email: '',
     password: '',
-    status: '',
-    image_code: '',
     doctor: '',
     address: ''
   });
