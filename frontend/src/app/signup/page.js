@@ -149,6 +149,8 @@ export default function Signup() {
         )}
         <div className='signupheads'>
   {error && <div className='head2' style={{ color: 'red' }}>{error}</div>}
+  {message && <div className='head2' style={{ color: 'green' }}>{message}</div>}
+
 </div>
 
       </div>
