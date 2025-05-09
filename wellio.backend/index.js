@@ -105,8 +105,7 @@ const Users = mongoose.model('Users', new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    status: { type: String, required: true },
-    image_code: { type: String, required: true },
+    status: { type: String, required: false },
     doctor: { type: String, required: true },
     address: { type: String, required: true },
     date: { type: Date, default: Date.now }
@@ -231,7 +230,18 @@ app.post('/login', async (req, res) => {
             return res.json({ success: false, errors: "Incorrect password" });
         }
 
-        const token = jwt.sign({ user: { id: user.id } }, 'secret_ecom', { expiresIn: '730h' });
+        const token = jwt.sign(
+            {
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    appUser: "Patient"
+                }
+            },
+            'secret_ecom',
+            { expiresIn: '730h' }
+        );
+
         res.json({ success: true, token });
 
     } catch (error) {
@@ -545,7 +555,17 @@ app.post('/doctor/login', async (req, res) => {
             return res.json({ success: false, errors: "Incorrect password" });
         }
 
-        const token = jwt.sign({ doctor: { id: doctor.id } }, 'secret_doctor', { expiresIn: '730h' });
+        const token = jwt.sign(
+            {
+                doctor: {
+                    id: doctor.id,
+                    email: doctor.email,
+                    appUser: "Doctor"
+                }
+            },
+            'secret_doctor',
+            { expiresIn: '730h' }
+        );
 
         res.json({
             success: true,
