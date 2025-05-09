@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Logo from './../assets/Doord.svg';
+import Logo from './../assets/wellio-logo.svg';
 import Menu from './../assets/Menubtn.svg';
 import Remove from './../assets/remove.svg';
 import { usePathname } from 'next/navigation';
@@ -21,11 +21,11 @@ const Navbar = () => {
     const fetchUserName = async () => {
       const userEmail = localStorage.getItem('userEmail'); // Get email from storage
       if (!userEmail) return;
-  
+
       try {
         const response = await fetch('https://doord.onrender.com/allusers');
         const users = await response.json();
-  
+
         // Find user by email
         const user = users.find(u => u.email === userEmail);
         if (user) {
@@ -36,7 +36,7 @@ const Navbar = () => {
         console.error('Failed to fetch users:', err);
       }
     };
-  
+
     fetchUserName();
   }, []);
 
@@ -48,8 +48,8 @@ const Navbar = () => {
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Services', path: '/services' },
-    { name: 'Explore', path: '/explore' },
+    // { name: 'Services', path: '/services' },
+    // { name: 'Explore', path: '/explore' },
     { name: 'Contact Us', path: '/contact' },
   ];
 
@@ -64,8 +64,8 @@ const Navbar = () => {
       {/* Desktop Navigation */}
       <div className='navbar-center desktop-only'>
         {navLinks.map((link) => (
-          <Link 
-            key={link.path} 
+          <Link
+            key={link.path}
             href={link.path}
             className={`nav-link ${pathname === link.path ? 'active' : ''}`}
           >
@@ -84,22 +84,22 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link href='/signin' className='sign-in-btn'>Sign In</Link>
-              <Link href='/signup' className='sign-up-btn'>Sign Up</Link>
+              <Link href='/signin' className='sign-in-btn '>Login As Doctor</Link>
+              <Link href='/signup' className='sign-up-btn'>Login As Patient</Link>
             </>
           )}
         </div>
 
         {/* Mobile Menu Button */}
-        <button 
+        <button
           ref={buttonRef}
           className='hamburger-btn mobile-only'
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
-          <Image 
+          <Image
             className='menu-icon'
-            src={isMenuOpen ? Remove : Menu} 
-            alt='menu' 
+            src={isMenuOpen ? Remove : Menu}
+            alt='menu'
           />
         </button>
       </div>
@@ -107,8 +107,8 @@ const Navbar = () => {
       {/* Mobile Navigation Menu */}
       <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
         {navLinks.map((link) => (
-          <Link 
-            key={link.path} 
+          <Link
+            key={link.path}
             href={link.path}
             className={`mobile-nav-link ${pathname === link.path ? 'active' : ''}`}
             onClick={() => setIsMenuOpen(false)}
@@ -116,7 +116,7 @@ const Navbar = () => {
             {link.name}
           </Link>
         ))}
-        
+
         <div className='mobile-auth-buttons'>
           {userName ? (
             <>
@@ -125,8 +125,8 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link href='/signin' className='mobile-sign-in-btn' onClick={() => setIsMenuOpen(false)}>Sign In</Link>
-              <Link href='/signup' className='mobile-sign-up-btn' onClick={() => setIsMenuOpen(false)}>Sign Up</Link>
+              <Link href='/signup' className='mobile-sign-up-btn' onClick={() => setIsMenuOpen(false)}>Login As Doctor</Link>
+              <Link href='/signin' className='mobile-sign-in-btn' onClick={() => setIsMenuOpen(false)}>Login As Patient</Link>
             </>
           )}
         </div>
