@@ -2,7 +2,6 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import "./ForgotPassword.css";
 import Arrow from "./../assets/arrow-right.png";
 

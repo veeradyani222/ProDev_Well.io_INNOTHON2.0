@@ -4,9 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import './SignUp.css';
-import Google from './../assets/Google.svg';
-import Facebook from './../assets/Facebook.svg';
-import Apple from './../assets/Apple.svg';
 import Arrow from './../assets/arrow-right.png';
 
 export default function Signup() {
