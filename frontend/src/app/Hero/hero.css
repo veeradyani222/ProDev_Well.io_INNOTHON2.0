@@ -15,7 +15,6 @@
 }
 
 .hero-content {
- /* max-width: 1200px; */
  margin: 0 auto;
  display: flex;
  align-items: center;
@@ -27,25 +26,24 @@
 .hero-text {
  flex: 1 1 500px;
  text-align: left;
+ padding-left: 30px;
+ /* shifted text a bit left */
 }
 
 .hero-title {
- font-size: 3rem;
+ font-size: 3.5rem;
+ /* bigger title */
  font-weight: 800;
  color: var(--primary-color);
  margin-bottom: 20px;
 }
 
 .hero-description {
- font-size: 1.2rem;
+ font-size: 1.3rem;
+ /* slightly bigger description */
  line-height: 1.6;
  margin-bottom: 30px;
  color: var(--text-color);
-}
-
-.hero-btn.primary-btn a {
- text-decoration: none;
- color: var(--white);
 }
 
 .hero-buttons {
@@ -62,6 +60,11 @@
  cursor: pointer;
  transition: background 0.3s ease;
  font-family: var(--font-family);
+}
+
+.hero-btn.primary-btn a {
+ text-decoration: none;
+ color: var(--white);
 }
 
 .primary-btn {
@@ -84,11 +87,12 @@
 }
 
 .hero-animation {
- flex: 1 1 400px;
- max-width: 500px;
+ flex: 1 1 500px;
+ max-width: 600px;
+ margin: -40px -40px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
  .hero-content {
   flex-direction: column;
   text-align: center;
@@ -96,14 +100,17 @@
 
  .hero-text {
   text-align: center;
+  padding-left: 0;
  }
 
  .hero-title {
-  font-size: 2.2rem;
+  font-size: 2.5rem;
+  /* title larger on mobile */
  }
 
  .hero-description {
-  font-size: 1rem;
+  font-size: 1.2rem;
+  /* bigger description */
  }
 
  .hero-btn {
@@ -113,7 +120,7 @@
  }
 
  .hero-animation {
-  width: 100%;
-  height: auto;
+  display: none;
+  /* hide animation on mobile */
  }
 }

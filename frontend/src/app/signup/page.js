@@ -105,7 +105,7 @@ export default function Signup() {
           <>
             <div className='signupheads'>
               <div className='head1'>CREATE AN ACCOUNT</div>
-              <div className='head2'>Start here</div>
+              <div className='head2'>Join as a Patient</div>
             </div>
             <form onSubmit={handleSubmit} className='inputs-form'>
               <div className='input-order'><label>Your Name</label>
