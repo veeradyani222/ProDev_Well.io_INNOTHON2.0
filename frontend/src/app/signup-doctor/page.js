@@ -7,9 +7,16 @@ import './SignUp.css';
 import Arrow from './../assets/arrow-right.png';
 
 export default function Signup() {
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    address: '',
+    phone: '',
+    about: ''
+  });
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [step, setStep] = useState('signup'); // 'signup' or 'otpVerification'
+  const [step, setStep] = useState('signup');
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const router = useRouter();
@@ -19,13 +26,10 @@ export default function Signup() {
   };
 
   const handleOtpChange = (index, value) => {
-    if (!/^\d*$/.test(value)) return; // Allow only numbers
-
+    if (!/^\d*$/.test(value)) return;
     const newOtp = [...otp];
-    newOtp[index] = value.slice(-1); // Ensure only one digit per input
+    newOtp[index] = value.slice(-1);
     setOtp(newOtp);
-
-    // Move to next input field if a number is entered
     if (value && index < 5) {
       document.getElementById(`otp-${index + 1}`).focus();
     }
@@ -33,11 +37,9 @@ export default function Signup() {
 
   const handleOtpKeyDown = (index, e) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
-      // Move to previous input field on backspace
       document.getElementById(`otp-${index - 1}`).focus();
     }
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,7 +47,7 @@ export default function Signup() {
     setError(null);
 
     try {
-      const response = await fetch('https://doord.onrender.com/signup', {
+      const response = await fetch('https://wellio-backend.onrender.com/doctor/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -54,7 +56,7 @@ export default function Signup() {
       const data = await response.json();
       if (response.ok) {
         setMessage(data.message);
-        setStep('otpVerification'); // Move to OTP verification step
+        setStep('otpVerification');
       } else {
         setError(data.errors || 'Signup failed.');
       }
@@ -69,7 +71,7 @@ export default function Signup() {
     setError(null);
 
     try {
-      const response = await fetch('https://doord.onrender.com/verify-email', {
+      const response = await fetch('https://wellio-backend.onrender.com/doctor/verify-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email, verificationCode: otp.join('') }),
@@ -78,8 +80,6 @@ export default function Signup() {
       const data = await response.json();
       if (response.ok) {
         setMessage("OTP Verified! Redirecting to Sign In...");
-        
-        // Delay for 2 seconds, then redirect to Sign In
         setTimeout(() => {
           router.push('/signin');
         }, 2000);
@@ -118,10 +118,21 @@ export default function Signup() {
                 <label>Password</label>
                 <input type="password" name="password" value={formData.password} onChange={handleChange} required />
               </div>
+              <div className='input-order'>
+                <label>Address</label>
+                <input type="text" name="address" value={formData.address} onChange={handleChange} required />
+              </div>
+              <div className='input-order'>
+                <label>Phone</label>
+                <input type="text" name="phone" value={formData.phone} onChange={handleChange} required />
+              </div>
+              <div className='input-order'>
+                <label>About (Optional)</label>
+                <textarea name="about" value={formData.about} onChange={handleChange} />
+              </div>
               <button type="submit" className="submit-btn">Get Started</button>
             </form>
             <div className='orusecont'><div className='oruse'> Or Use </div></div>
-            
           </div>
         ) : (
           <div>
@@ -141,18 +152,17 @@ export default function Signup() {
                   />
                 ))}
               </div>
-
-              <button className="signinbtn" type="submit"> <div>Proceed</div>
-                <Image src={Arrow} alt="Go" className="social-icon" width={40} height={40} /> </button>
+              <button className="signinbtn" type="submit">
+                <div>Proceed</div>
+                <Image src={Arrow} alt="Go" className="social-icon" width={40} height={40} />
+              </button>
             </form>
           </div>
         )}
         <div className='signupheads'>
-  {error && <div className='head2' style={{ color: 'red' }}>{error}</div>}
-  {message && <div className='head2' style={{ color: 'green' }}>{message}</div>}
-
-</div>
-
+          {error && <div className='head2' style={{ color: 'red' }}>{error}</div>}
+          {message && <div className='head2' style={{ color: 'green' }}>{message}</div>}
+        </div>
       </div>
     </div>
   );
