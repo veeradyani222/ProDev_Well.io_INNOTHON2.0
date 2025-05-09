@@ -62,8 +62,9 @@ export default function ForgotPassword() {
       } else {
         setError(data.message || "Failed to send OTP.");
       }
-    } catch (err) {
+    } catch  {
       setError("Failed to send OTP.");
+      
     }
   };
 
@@ -89,7 +90,7 @@ export default function ForgotPassword() {
       } else {
         setError(data.message || "Invalid OTP.");
       }
-    } catch (err) {
+    } catch  {
       setError("OTP verification failed.");
     }
 };
@@ -122,7 +123,7 @@ const handleResetPassword = async (e) => {
         } else {
             setError(data.message || "Password reset failed.");
         }
-    } catch (err) {
+    } catch{
         setError("Password reset failed.");
     }
 };

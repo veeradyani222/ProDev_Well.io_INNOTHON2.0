@@ -58,7 +58,7 @@ export default function Signup() {
       } else {
         setError(data.errors || 'Signup failed.');
       }
-    } catch (err) {
+    } catch {
       setError('Signup failed.');
     }
   };
@@ -86,7 +86,7 @@ export default function Signup() {
       } else {
         setError(data.errors || 'OTP verification failed.');
       }
-    } catch (err) {
+    } catch {
       setError('OTP verification failed.');
     }
   };

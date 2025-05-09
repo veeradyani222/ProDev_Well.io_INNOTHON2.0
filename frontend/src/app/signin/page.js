@@ -33,7 +33,7 @@ export default function SignIn() {
       } else {
         setError(data.errors || 'Login failed.');
       }
-    } catch (err) {
+    } catch {
       setError('Login failed.');
     }
   };
