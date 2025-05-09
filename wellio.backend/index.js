@@ -726,6 +726,7 @@ app.post("/doctor/reset-password", async (req, res) => {
 
 
 const users = [
+<<<<<<< Updated upstream
     {
         name: "Veer Adyani",
         email: "veeradyani12@gmail.com",
@@ -756,6 +757,38 @@ const users = [
         gender: "Female",
         age: 23
     }
+=======
+  {
+    name: "Veer Adyani",
+    email: "veeradyani12@gmail.com",
+    gender: "Male",
+    age: 20
+  },
+  {
+    name: "Shorya Jain",
+    email: "shorya1016@gmail.com",
+    gender: "Female",
+    age: 22
+  },
+  {
+    name: "Priya Sharma",
+    email: "shorya.2098@gmail.com",
+    gender: "Female",
+    age: 24
+  },
+  {
+    name: "Vaidik Sule",
+    email: "vaidiksule@gmail.com",
+    gender: "Male",
+    age: 21
+  },
+  {
+    name: "Ishita Sule",
+    email: "vaidiksulemusic@gmail.com",
+    gender: "Female",
+    age: 23
+  }
+>>>>>>> Stashed changes
 ];
 
 // Generate random vitals
