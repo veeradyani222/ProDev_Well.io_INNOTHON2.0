@@ -9,7 +9,7 @@
 }
 
 .hero-container {
- padding: 60px 20px;
+ padding: 80px 20px;
  background: linear-gradient(135deg, var(--background-color), var(--secondary-color));
  font-family: var(--font-family);
 }
