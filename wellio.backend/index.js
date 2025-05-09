@@ -107,7 +107,7 @@ const Users = mongoose.model('Users', new mongoose.Schema({
     password: { type: String, required: true },
     status: { type: String, required: true },
     image_code: { type: String, required: true },
-    doctor: { type: Boolean, default: false },
+    doctor: { type: String, required:true},
     address: { type: String, required: true },
     date: { type: Date, default: Date.now }
 }));
@@ -392,25 +392,23 @@ app.get('/allusers', async (req, res) => {
 // ... existing code ...
 
 // Merchant Schema
-const Merchants = mongoose.model('Merchants', new mongoose.Schema({
+const Doctors = mongoose.model('Doctors', new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     address: { type: String, required: true },
-    services: [{ type: String }], // Array of services
-    images: [{ type: String }], // Array of image URLs
-    description: { type: String },
+    patients: [{ type: String }],
+    about: { type: String },
     phone: { type: String, required: true },
     isVerified: { type: Boolean, default: false },
     date: { type: Date, default: Date.now }
 }));
 
-const pendingMerchantVerifications = {}; // Store pending merchant email verifications
+const pendingDoctorVerifications = {}; // Store pending doctor email verifications
 
-// Merchant signup route
-app.post('/merchant/signup', async (req, res) => {
+app.post('/doctor/signup', async (req, res) => {
     try {
-        const { name, email, password, address, services, phone, description } = req.body;
+        const { name, email, password, address, phone, about } = req.body;
 
         // Validate input
         if (!name || !email || !password || !address || !phone) {
@@ -418,8 +416,8 @@ app.post('/merchant/signup', async (req, res) => {
         }
 
         // Check if email already exists
-        const existingMerchant = await Merchants.findOne({ email });
-        if (existingMerchant) {
+        const existingDoctor = await Doctors.findOne({ email });
+        if (existingDoctor) {
             return res.status(400).json({
                 success: false,
                 errors: "Email is already registered."
@@ -430,14 +428,14 @@ app.post('/merchant/signup', async (req, res) => {
         const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
         // Store pending verification
-        pendingMerchantVerifications[email] = {
+        pendingDoctorVerifications[email] = {
             name,
             email,
             password,
             address,
-            services: services || [],
             phone,
-            description: description || '',
+            about: about || '',
+            patients: [],
             verificationCode,
             createdAt: Date.now()
         };
@@ -454,118 +452,133 @@ app.post('/merchant/signup', async (req, res) => {
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,
-            subject: 'Verify Your Merchant Account',
+            subject: 'Verify Your Well.io Doctor Account',
             html: `
-                <h2>Merchant Email Verification</h2>
-                <p>Hi ${name},</p>
-                <p>Your verification code is: <strong>${verificationCode}</strong></p>
-                <p>This code will expire in 15 minutes.</p>
+                <html>
+                    <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f9f9f9; color: #333;">
+                        <h2 style="color: #1d3c34;">Welcome to Well.io, Dr. ${name}!</h2>
+                        <p>Please verify your email to activate your account.</p>
+                        <p>Your verification code is: <strong style="font-size: 20px; color: #4CAF50;">${verificationCode}</strong></p>
+                        <p>This code expires in 15 minutes.</p>
+                        <p>If you didn’t request this, please ignore this email.</p>
+                        <br>
+                        <p>– The Well.io Team</p>
+                    </body>
+                </html>
             `
         });
 
         res.json({ success: true, message: "Please verify your email address." });
 
     } catch (error) {
-        console.error("Error during merchant signup:", error);
+        console.error("Error during doctor signup:", error);
         res.status(500).json({ error: "Signup failed." });
     }
 });
 
-// Verify merchant email route
-app.post('/merchant/verify-email', async (req, res) => {
+app.post('/doctor/verify-email', async (req, res) => {
     try {
         const { email, verificationCode } = req.body;
-        const pendingMerchant = pendingMerchantVerifications[email];
+        const pendingDoctor = pendingDoctorVerifications[email];
 
-        if (!pendingMerchant) {
+        // Check if pending verification exists
+        if (!pendingDoctor) {
             return res.status(400).json({ success: false, errors: "Verification expired or invalid email." });
         }
 
-        if (pendingMerchant.verificationCode !== verificationCode) {
+        // Check if verification code matches
+        if (pendingDoctor.verificationCode !== verificationCode) {
             return res.status(400).json({ success: false, errors: "Invalid verification code." });
         }
 
-        // Create and save verified merchant
-        const merchant = new Merchants({
-            name: pendingMerchant.name,
-            email: pendingMerchant.email,
-            password: pendingMerchant.password,
-            address: pendingMerchant.address,
-            services: pendingMerchant.services,
-            phone: pendingMerchant.phone,
-            description: pendingMerchant.description,
+        // Create and save verified doctor
+        const doctor = new Doctors({
+            name: pendingDoctor.name,
+            email: pendingDoctor.email,
+            password: pendingDoctor.password, // Consider hashing before saving
+            address: pendingDoctor.address,
+            phone: pendingDoctor.phone,
+            about: pendingDoctor.about,
+            patients: pendingDoctor.patients,
             isVerified: true
         });
 
-        await merchant.save();
-        delete pendingMerchantVerifications[email];
+        await doctor.save();
+        delete pendingDoctorVerifications[email];
 
-        // Generate token for automatic login after verification
-        const token = jwt.sign({ merchant: { id: merchant.id } }, 'secret_ecom', { expiresIn: '730h' });
+        // Generate token for auto login
+        const token = jwt.sign({ doctor: { id: doctor.id } }, 'secret_doctor', { expiresIn: '730h' });
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             message: "Email verified successfully.",
             token,
-            merchant: {
-                id: merchant.id,
-                name: merchant.name,
-                email: merchant.email
+            doctor: {
+                id: doctor.id,
+                name: doctor.name,
+                email: doctor.email
             }
         });
+
     } catch (error) {
-        console.error("Error during merchant verification:", error);
+        console.error("Error during doctor email verification:", error);
         res.status(500).json({ error: "Verification failed." });
     }
 });
 
+
 // Merchant login route
-app.post('/merchant/login', async (req, res) => {
+const bcrypt = require('bcryptjs');
+
+app.post('/doctor/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        const merchant = await Merchants.findOne({ email });
+        const doctor = await Doctors.findOne({ email });
 
-        if (!merchant) {
+        if (!doctor) {
             return res.json({ success: false, errors: "Email not found" });
         }
 
-        if (password !== merchant.password) {
+        // Compare hashed password
+        const isMatch = await bcrypt.compare(password, doctor.password);
+        if (!isMatch) {
             return res.json({ success: false, errors: "Incorrect password" });
         }
 
-        const token = jwt.sign({ merchant: { id: merchant.id } }, 'secret_ecom', { expiresIn: '730h' });
-        res.json({ 
-            success: true, 
+        const token = jwt.sign({ doctor: { id: doctor.id } }, 'secret_doctor', { expiresIn: '730h' });
+
+        res.json({
+            success: true,
             token,
-            merchant: {
-                id: merchant.id,
-                name: merchant.name,
-                email: merchant.email
+            doctor: {
+                id: doctor.id,
+                name: doctor.name,
+                email: doctor.email
             }
         });
 
     } catch (error) {
-        console.error("Merchant login error:", error);
+        console.error("Doctor login error:", error);
         res.status(500).json({ success: false, errors: "Login failed" });
     }
 });
 
 // Middleware for merchant authentication
-const fetchMerchant = async (req, res, next) => {
+const fetchDoctor = async (req, res, next) => {
     try {
         const token = req.header('auth-token');
         if (!token) {
             return res.status(401).json({ success: false, errors: "Please authenticate using a valid token" });
         }
 
-        const decoded = jwt.verify(token, 'secret_ecom');
-        const merchant = await Merchants.findById(decoded.merchant.id).select('-password');
-        
-        if (!merchant) {
-            return res.status(404).json({ success: false, errors: "Merchant not found" });
+        const decoded = jwt.verify(token, 'secret_doctor');
+        const doctor = await Doctors.findById(decoded.doctor.id).select('-password');
+
+        if (!doctor) {
+            return res.status(404).json({ success: false, errors: "Doctor not found" });
         }
 
-        req.merchant = merchant;
+        req.doctor = doctor;
         next();
 
     } catch (error) {
@@ -573,42 +586,37 @@ const fetchMerchant = async (req, res, next) => {
         res.status(401).json({ success: false, errors: "Please authenticate using a valid token" });
     }
 };
-
-// Get merchant profile
-app.get('/merchant/profile', fetchMerchant, async (req, res) => {
+app.get('/doctor/profile', fetchDoctor, async (req, res) => {
     try {
         res.json({
             success: true,
-            merchant: req.merchant
+            doctor: req.doctor
         });
     } catch (error) {
-        console.error("Error fetching merchant profile:", error);
-        res.status(500).json({ error: "Failed to fetch merchant profile" });
+        console.error("Error fetching doctor profile:", error);
+        res.status(500).json({ error: "Failed to fetch doctor profile" });
     }
 });
 
-// Update merchant profile
-app.put('/merchant/update-profile', fetchMerchant, async (req, res) => {
+app.put('/doctor/update-profile', fetchDoctor, async (req, res) => {
     try {
-        const { name, address, services, phone, description } = req.body;
-        const merchant = await Merchants.findById(req.merchant.id);
+        const { name, address, phone, about } = req.body;
+        const doctor = await Doctors.findById(req.doctor.id);
 
-        merchant.name = name || merchant.name;
-        merchant.address = address || merchant.address;
-        merchant.services = services || merchant.services;
-        merchant.phone = phone || merchant.phone;
-        merchant.description = description || merchant.description;
+        doctor.name = name || doctor.name;
+        doctor.address = address || doctor.address;
+        doctor.phone = phone || doctor.phone;
+        doctor.about = about || doctor.about;
 
-        await merchant.save();
+        await doctor.save();
 
-        res.json({ success: true, message: 'Profile updated successfully', merchant });
+        res.json({ success: true, message: 'Profile updated successfully', doctor });
     } catch (error) {
-        console.error("Error updating merchant profile:", error);
+        console.error("Error updating doctor profile:", error);
         res.status(500).json({ error: "Failed to update profile" });
     }
 });
 
-// ... existing code ...
 
 app.listen(port, (error) => {
     if (!error) {
