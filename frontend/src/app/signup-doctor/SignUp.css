@@ -1,96 +1,105 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Zen+Kaku+Gothic+Antique&display=swap');
 
+:root {
+    --primary-color: #3f7d58;
+    --secondary-color: #E4EFE7;
+    --background-color: #FDFAF6;
+    --text-color: #333;
+    --text-muted: #eee;
+    --white: #ffffff;
+    --hover-color: #53a173;
+    --font-family: "Inter", sans-serif;
+    --heading-font: "Zen Kaku Gothic Antique", sans-serif;
+    --accent-color: var(--primary-color);
+    --accent-hover: var(--hover-color);
+    --input-border: #444;
+    --label-color: #666;
+    --error-color: red;
+    --success-color: green;
+}
+
 .signup-container .container {
-    background: #fff;
+    background: var(--white);
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    font-family: "Zen Kaku Gothic Antique", sans-serif;
+    font-family: var(--heading-font);
     position: relative;
     width: 100%;
-    max-width: 500px; /* Prevents excessive stretching */
+    max-width: 500px;
     margin: 0 auto;
 }
 
-/* Center the Signup Box */
 .signup-container {
     width: 40vw;
     margin: 5vh auto;
 }
 
-/* Center Heading */
 .signupheads {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5vh;
-  font-family: "Zen Kaku Gothic Antique", sans-serif;
-  margin: 0vh auto;
-  text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5vh;
+    font-family: var(--heading-font);
+    margin: 0vh auto;
+    text-align: center;
 }
 
-/* Head 1 (Big Title) */
 .signupheads .head1 {
-  font-size: 3vh;
-  font-weight: 900;
-  margin-bottom: 1vh;
+    font-size: 3vh;
+    font-weight: 900;
+    margin-bottom: 1vh;
 }
 
-/* Head 2 (Smaller Text Below) */
 .signupheads .head2 {
-  font-size: 2vh;
-  font-weight: 400;
-  width: auto;
-  margin-bottom: 1vh;
+    font-size: 2vh;
+    font-weight: 400;
+    width: auto;
+    margin-bottom: 1vh;
 }
 
-/* Form */
 .signup-container form {
     display: flex;
     flex-direction: column;
 }
 
-/* Label */
 .signup-container label {
-  font-size: 1.6vh;
-  color: #666;
-  font-weight: 400;
-  font-family: "Zen Kaku Gothic Antique", sans-serif;
-  text-transform: capitalize;
-  background: white;
-  padding: 0 6px;
-  position: absolute;
-  top: -8px;
-  left: 14px;
-  z-index: 10;
+    font-size: 1.6vh;
+    color: var(--label-color);
+    font-weight: 400;
+    font-family: var(--heading-font);
+    text-transform: capitalize;
+    background: var(--white);
+    padding: 0 6px;
+    position: absolute;
+    top: -8px;
+    left: 14px;
+    z-index: 10;
 }
 
-/* Input Fields */
 .signup-container input {
-  width: 30vw;
-  padding: 12px;
-  border: 1px solid #444;
-  border-radius: 5px;
-  font-size: 14px;
-  margin-bottom: 25px;
-  color: #555;
-  font-family: "Inter", sans-serif;
-  background: white;
+    width: 30vw;
+    padding: 12px;
+    border: 1px solid var(--input-border);
+    border-radius: 5px;
+    font-size: 14px;
+    margin-bottom: 25px;
+    color: var(--text-color);
+    font-family: var(--font-family);
+    background: var(--white);
 }
 
-/* Ensures proper positioning */
 .signup-container .input-order {
-  position: relative;
-  margin-bottom: 20px;
+    position: relative;
+    margin-bottom: 20px;
 }
 
-/* Button */
 .signup-container button {
     width: 32vw;
-    background: #1177FF;
+    background: var(--accent-color);
     border: none;
     border-radius: 1vh;
-    color: white;
+    color: var(--white);
     font-size: 14px;
     cursor: pointer;
     margin: 0 auto;
@@ -98,49 +107,46 @@
 }
 
 .signup-container button:hover {
-    background: #0056b3;
+    background: var(--accent-hover);
 }
 
-/* Error & Success Messages */
 .signup-container .message {
     text-align: center;
     margin-top: 10px;
 }
 
 .signup-container .message.success {
-    color: green;
+    color: var(--success-color);
 }
 
 .signup-container .message.error {
-    color: red;
+    color: var(--error-color);
 }
 
 .signup-container .otp-container {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 2vh;
-  margin-top: 2vh;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 2vh;
+    margin-top: 2vh;
 }
 
 .signup-container .otp-input {
-  width: 2vw;
-  height: 3vh;
-  text-align: center;
-  font-size: 18px;
-  border-radius: 0;
-  border-top: none;
-  border-left: none;
-  border-right: none;
+    width: 2vw;
+    height: 3vh;
+    text-align: center;
+    font-size: 18px;
+    border-radius: 0;
+    border-top: none;
+    border-left: none;
+    border-right: none;
 }
 
-/* Input Section */
 .signup-container .inputs-form {
     width: 40vw;
     margin: 0 auto;
 }
 
-/* Sign-in Link (Right-Aligned) */
 .container1 {
     display: flex;
     justify-content: flex-end;
@@ -149,67 +155,63 @@
 
 .head3 {
     font-size: 2vh;
-    font-family: "Zen Kaku Gothic Antique", sans-serif;
+    font-family: var(--heading-font);
 }
 
 .head3 a {
-    color: #1177FF;
+    color: var(--accent-color);
     text-decoration: none;
 }
 
-/* Form Layout */
 .input-order {
     display: flex;
     flex-direction: column;
     margin: 0 auto;
 }
 
-/* Or Use Section */
 .orusecont {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 5vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5vh;
 }
 
 .oruse {
-  text-transform: uppercase;
-  font-family: "Zen Kaku Gothic Antique", sans-serif;
-  font-size: 1.5vh;
+    text-transform: uppercase;
+    font-family: var(--heading-font);
+    font-size: 1.5vh;
 }
 
-/* Social Buttons */
 .otherbtns {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2vh;
-  margin-top: 2vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2vh;
+    margin-top: 2vh;
 }
 
 .social-icon {
-  cursor: pointer;
-}
-.signup-container .signinbtn {
-  width: 32vw; /* Matches input width */
-  background: #1177FF;
-  border: none;
-  border-radius: 1vh;
-  color: white;
-  font-size: 14px;
-  cursor: pointer;
-  margin: 0 auto;
-  padding: 2vh;
-  text-align: left;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+    cursor: pointer;
 }
 
-/* RESPONSIVE STYLES */
+.signup-container .signinbtn {
+    width: 32vw;
+    background: var(--accent-color);
+    border: none;
+    border-radius: 1vh;
+    color: var(--white);
+    font-size: 14px;
+    cursor: pointer;
+    margin: 0 auto;
+    padding: 2vh;
+    text-align: left;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
 @media screen and (max-width: 500px) {
-    
     .signup-container {
         width: 90vw;
     }
@@ -220,13 +222,12 @@
         width: 90%;
     }
 
-    /* Adjust Headings */
     .signupheads {
         margin: 3vh auto;
         text-align: center;
     }
 
-    .signupheads .head1  {
+    .signupheads .head1 {
         font-size: 2.5vh;
     }
 
@@ -234,24 +235,16 @@
         font-size: 1.8vh;
     }
 
-    /* Input Section */
     .signup-container .inputs-form {
         width: 90vw;
         margin: 0 auto;
     }
 
-    /* Center Inputs */
-    .signup-container input {
-    
-    }
-
-    /* Center Button */
     .signup-container button {
         justify-content: center;
         text-align: center;
     }
 
-    /* Center OTP Fields */
     .signup-container .otp-container {
         justify-content: center;
         gap: 2vw;
@@ -261,36 +254,32 @@
         width: 16%;
     }
 
-    /* Center Sign-in Link */
     .container1 {
         justify-content: center;
     }
 
-    /* Center 'Or use' text */
     .orusecont {
         justify-content: center;
     }
 
-    /* Center Social Media Icons */
     .otherbtns {
         justify-content: center;
     }
 
-    /* Fix Label Position */
     .signup-container label {
         top: -8px;
     }
 
     .signup-container input,
     .signup-container button {
-        width: 85vw; /* Ensures both inputs and button take full container width */
+        width: 85vw;
     }
 
     .signup-container .inputs-form {
-        width: 100%; /* Ensures the form container is also full width */
+        width: 100%;
     }
 
     .signup-container .signinbtn {
-      width: 70vw; /* Matches input width */
+        width: 70vw;
     }
 }

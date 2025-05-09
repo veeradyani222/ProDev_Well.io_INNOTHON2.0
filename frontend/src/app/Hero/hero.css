@@ -5,7 +5,7 @@
  --text-color: #333;
  --text-muted: #eee;
  --white: #ffffff;
- --font-family: "Inter", sans-serif;
+ --font-family: "Cal Sans", sans-serif;
 }
 
 .hero-container {
@@ -41,6 +41,11 @@
  line-height: 1.6;
  margin-bottom: 30px;
  color: var(--text-color);
+}
+
+.hero-btn.primary-btn a {
+ text-decoration: none;
+ color: var(--white);
 }
 
 .hero-buttons {

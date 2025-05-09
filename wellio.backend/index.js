@@ -617,67 +617,174 @@ app.put('/doctor/update-profile', fetchDoctor, async (req, res) => {
     }
 });
 
+app.post("/doctor/forgot-password", async (req, res) => {
+    try {
+        const { email } = req.body;
+        const doctor = await Doctors.findOne({ email });
+
+        if (!doctor) {
+            return res.status(404).json({ message: "Doctor not found" });
+        }
+
+        const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const resetToken = jwt.sign({ doctorId: doctor._id }, "secret_doctor", { expiresIn: "15m" });
+
+        pendingDoctorVerifications[email] = { resetCode, resetToken, createdAt: Date.now() };
+
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "Well.io Doctor Password Reset Code",
+            html: `
+                <html>
+                    <body style="background-color: #f4f4f4; font-family: Arial, sans-serif; padding: 20px; color: #333;">
+                        <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                            <h2 style="color: #1d3c34;">Doctor Password Reset - Well.io</h2>
+                            <p>Hi Dr. ${doctor.name},</p>
+                            <p>You requested a password reset. Use the following one-time code to proceed:</p>
+                            <div style="font-size: 24px; font-weight: bold; margin: 20px 0; color: #4CAF50;">${resetCode}</div>
+                            <p>This code is valid for 15 minutes.</p>
+                            <p>If you didn’t request this, please ignore this email.</p>
+                            <p style="margin-top: 30px;">– The Well.io Team</p>
+                        </div>
+                    </body>
+                </html>
+            `
+        });
+
+        res.json({ success: true, message: "OTP sent to email", resetToken });
+
+    } catch (error) {
+        console.error("Doctor Forgot Password Error:", error);
+        res.status(500).json({ message: "Error sending OTP" });
+    }
+});
+
+
+app.post("/doctor/verify-forgot-otp", async (req, res) => {
+    try {
+        const { resetToken, resetCode } = req.body;
+        const decoded = jwt.verify(resetToken, "secret_doctor");
+        const doctor = await Doctors.findById(decoded.doctorId);
+
+        if (!doctor) {
+            return res.status(404).json({ message: "Doctor not found" });
+        }
+
+        const pendingReset = pendingDoctorVerifications[doctor.email];
+        if (!pendingReset || pendingReset.resetCode !== resetCode) {
+            return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+
+        res.json({ success: true, message: "OTP verified!" });
+
+    } catch (error) {
+        console.error("Doctor OTP Verification Error:", error);
+        res.status(400).json({ message: "Invalid or expired OTP" });
+    }
+});
+
+app.post("/doctor/reset-password", async (req, res) => {
+    try {
+        const { resetToken, newPassword } = req.body;
+
+        if (!resetToken || !newPassword) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
+
+        const decoded = jwt.verify(resetToken, "secret_doctor");
+        const doctor = await Doctors.findById(decoded.doctorId);
+
+        if (!doctor) {
+            return res.status(404).json({ message: "Doctor not found" });
+        }
+
+        if (!pendingDoctorVerifications[doctor.email]) {
+            return res.status(400).json({ message: "OTP verification required" });
+        }
+
+        doctor.password = newPassword; // Should ideally hash this!
+        await doctor.save();
+
+        delete pendingDoctorVerifications[doctor.email];
+
+        res.json({ success: true, message: "Password reset successful!" });
+
+    } catch (error) {
+        console.error("Doctor Reset Password Error:", error);
+        res.status(400).json({ message: "Invalid or expired token" });
+    }
+});
+
 
 const users = [
-  {
-    name: "Veer Adyani",
-    email: "veeradyani12@gmail.com",
-    gender: "Male",
-    age: 20
-  },
-  {
-    name: "Aarav Mehta",
-    email: "veeradyani2@gmail.com",
-    gender: "Male",
-    age: 22
-  },
-  {
-    name: "Priya Sharma",
-    email: "vwork108@gmail.com",
-    gender: "Female",
-    age: 24
-  },
-  {
-    name: "Vaidik Sule",
-    email: "vaidiksule@gmail.com",
-    gender: "Male",
-    age: 21
-  },
-  {
-    name: "Ishita Sule",
-    email: "vaidiksulemusic@gmail.com",
-    gender: "Female",
-    age: 23
-  }
+    {
+        name: "Veer Adyani",
+        email: "veeradyani12@gmail.com",
+        gender: "Male",
+        age: 20
+    },
+    {
+        name: "Aarav Mehta",
+        email: "veeradyani2@gmail.com",
+        gender: "Male",
+        age: 22
+    },
+    {
+        name: "Priya Sharma",
+        email: "vwork108@gmail.com",
+        gender: "Female",
+        age: 24
+    },
+    {
+        name: "Vaidik Sule",
+        email: "vaidiksule@gmail.com",
+        gender: "Male",
+        age: 21
+    },
+    {
+        name: "Ishita Sule",
+        email: "vaidiksulemusic@gmail.com",
+        gender: "Female",
+        age: 23
+    }
 ];
 
 // Generate random vitals
 function getRandomVital({ min, max, abnormalMin, abnormalMax }) {
-  const isAbnormal = Math.random() < 0.3; // 30% chance abnormal
-  if (!isAbnormal) return +(Math.random() * (max - min) + min).toFixed(1);
-  return Math.random() < 0.5
-    ? +(Math.random() * (abnormalMin.max - abnormalMin.min) + abnormalMin.min).toFixed(1)
-    : +(Math.random() * (abnormalMax.max - abnormalMax.min) + abnormalMax.min).toFixed(1);
+    const isAbnormal = Math.random() < 0.3; // 30% chance abnormal
+    if (!isAbnormal) return +(Math.random() * (max - min) + min).toFixed(1);
+    return Math.random() < 0.5
+        ? +(Math.random() * (abnormalMin.max - abnormalMin.min) + abnormalMin.min).toFixed(1)
+        : +(Math.random() * (abnormalMax.max - abnormalMax.min) + abnormalMax.min).toFixed(1);
 }
 
 // Return updated vitals for each call
 function getUserVitals() {
-  return users.map(user => {
-    return {
-      ...user,
-      vitals: {
-        bloodPressure: `${Math.floor(getRandomVital({ min: 90, max: 120, abnormalMin: { min: 70, max: 89 }, abnormalMax: { min: 121, max: 160 } }))}/${Math.floor(getRandomVital({ min: 60, max: 80, abnormalMin: { min: 40, max: 59 }, abnormalMax: { min: 81, max: 100 } }))}`,
-        oxygenLevel: getRandomVital({ min: 95, max: 100, abnormalMin: { min: 80, max: 89 }, abnormalMax: { min: 101, max: 105 } }),
-        heartbeat: getRandomVital({ min: 60, max: 100, abnormalMin: { min: 30, max: 59 }, abnormalMax: { min: 101, max: 150 } }),
-        temperature: getRandomVital({ min: 97, max: 99, abnormalMin: { min: 95, max: 96.9 }, abnormalMax: { min: 99.1, max: 103 } }),
-        breathingRate: getRandomVital({ min: 12, max: 20, abnormalMin: { min: 6, max: 11 }, abnormalMax: { min: 21, max: 30 } }),
-      }
-    };
-  });
+    return users.map(user => {
+        return {
+            ...user,
+            vitals: {
+                bloodPressure: `${Math.floor(getRandomVital({ min: 90, max: 120, abnormalMin: { min: 70, max: 89 }, abnormalMax: { min: 121, max: 160 } }))}/${Math.floor(getRandomVital({ min: 60, max: 80, abnormalMin: { min: 40, max: 59 }, abnormalMax: { min: 81, max: 100 } }))}`,
+                oxygenLevel: getRandomVital({ min: 95, max: 100, abnormalMin: { min: 80, max: 89 }, abnormalMax: { min: 101, max: 105 } }),
+                heartbeat: getRandomVital({ min: 60, max: 100, abnormalMin: { min: 30, max: 59 }, abnormalMax: { min: 101, max: 150 } }),
+                temperature: getRandomVital({ min: 97, max: 99, abnormalMin: { min: 95, max: 96.9 }, abnormalMax: { min: 99.1, max: 103 } }),
+                breathingRate: getRandomVital({ min: 12, max: 20, abnormalMin: { min: 6, max: 11 }, abnormalMax: { min: 21, max: 30 } }),
+            }
+        };
+    });
 };
 
 app.get('/api/vitals', (req, res) => {
-  res.json(getUserVitals());
+    res.json(getUserVitals());
 });
 
 app.listen(port, (error) => {

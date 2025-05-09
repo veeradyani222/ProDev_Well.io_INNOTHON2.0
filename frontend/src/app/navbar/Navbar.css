@@ -14,6 +14,7 @@
   justify-content: space-between;
   padding: 2vh 4vw;
   position: relative;
+  /* background: linear-gradient(0deg, var(--background-color), var(--white)); */
   background: var(--secondary-color);
   height: 10vh;
 }

@@ -131,7 +131,6 @@ export default function Signup() {
               </div>
               <button type="submit" className="submit-btn">Get Started</button>
             </form>
-            <div className='orusecont'><div className='oruse'> Or Use </div></div>
           </>
         ) : (
           <>
