@@ -618,6 +618,68 @@ app.put('/doctor/update-profile', fetchDoctor, async (req, res) => {
 });
 
 
+const users = [
+  {
+    name: "Veer Adyani",
+    email: "veeradyani12@gmail.com",
+    gender: "Male",
+    age: 20
+  },
+  {
+    name: "Aarav Mehta",
+    email: "veeradyani2@gmail.com",
+    gender: "Male",
+    age: 22
+  },
+  {
+    name: "Priya Sharma",
+    email: "vwork108@gmail.com",
+    gender: "Female",
+    age: 24
+  },
+  {
+    name: "Vaidik Sule",
+    email: "vaidiksule@gmail.com",
+    gender: "Male",
+    age: 21
+  },
+  {
+    name: "Ishita Sule",
+    email: "vaidiksulemusic@gmail.com",
+    gender: "Female",
+    age: 23
+  }
+];
+
+// Generate random vitals
+function getRandomVital({ min, max, abnormalMin, abnormalMax }) {
+  const isAbnormal = Math.random() < 0.3; // 30% chance abnormal
+  if (!isAbnormal) return +(Math.random() * (max - min) + min).toFixed(1);
+  return Math.random() < 0.5
+    ? +(Math.random() * (abnormalMin.max - abnormalMin.min) + abnormalMin.min).toFixed(1)
+    : +(Math.random() * (abnormalMax.max - abnormalMax.min) + abnormalMax.min).toFixed(1);
+}
+
+// Return updated vitals for each call
+function getUserVitals() {
+  return users.map(user => {
+    return {
+      ...user,
+      vitals: {
+        bloodPressure: `${Math.floor(getRandomVital({ min: 90, max: 120, abnormalMin: { min: 70, max: 89 }, abnormalMax: { min: 121, max: 160 } }))}/${Math.floor(getRandomVital({ min: 60, max: 80, abnormalMin: { min: 40, max: 59 }, abnormalMax: { min: 81, max: 100 } }))}`,
+        oxygenLevel: getRandomVital({ min: 95, max: 100, abnormalMin: { min: 80, max: 89 }, abnormalMax: { min: 101, max: 105 } }),
+        heartbeat: getRandomVital({ min: 60, max: 100, abnormalMin: { min: 30, max: 59 }, abnormalMax: { min: 101, max: 150 } }),
+        temperature: getRandomVital({ min: 97, max: 99, abnormalMin: { min: 95, max: 96.9 }, abnormalMax: { min: 99.1, max: 103 } }),
+        breathingRate: getRandomVital({ min: 12, max: 20, abnormalMin: { min: 6, max: 11 }, abnormalMax: { min: 21, max: 30 } }),
+      }
+    };
+  });
+};
+
+app.get('/api/vitals', (req, res) => {
+  res.json(getUserVitals());
+});
+
 app.listen(port, (error) => {
     if (!error) {
         console.log("Server is running on " + port);
