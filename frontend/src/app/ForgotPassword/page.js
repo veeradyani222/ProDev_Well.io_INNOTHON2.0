@@ -2,7 +2,6 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import "./ForgotPassword.css";
 import Arrow from "./../assets/arrow-right.png";
 
@@ -63,8 +62,9 @@ export default function ForgotPassword() {
       } else {
         setError(data.message || "Failed to send OTP.");
       }
-    } catch (err) {
+    } catch  {
       setError("Failed to send OTP.");
+      
     }
   };
 
@@ -90,7 +90,7 @@ export default function ForgotPassword() {
       } else {
         setError(data.message || "Invalid OTP.");
       }
-    } catch (err) {
+    } catch  {
       setError("OTP verification failed.");
     }
 };
@@ -123,7 +123,7 @@ const handleResetPassword = async (e) => {
         } else {
             setError(data.message || "Password reset failed.");
         }
-    } catch (err) {
+    } catch{
         setError("Password reset failed.");
     }
 };

@@ -1,4 +1,4 @@
-import Image from "next/image";
+
 import Footer from "./Footer/Footer";
 import Hero from "./Hero/hero";
 export default function Home() {

@@ -4,9 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import './signin.css'; // Keeping the same CSS file for consistency
-import Google from './../assets/Google.svg';
-import Facebook from './../assets/Facebook.svg';
-import Apple from './../assets/Apple.svg';
 import Arrow from './../assets/arrow-right.png';
 
 export default function SignIn() {
@@ -36,7 +33,7 @@ export default function SignIn() {
       } else {
         setError(data.errors || 'Login failed.');
       }
-    } catch (err) {
+    } catch {
       setError('Login failed.');
     }
   };

@@ -4,9 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import './SignUp.css';
-import Google from './../assets/Google.svg';
-import Facebook from './../assets/Facebook.svg';
-import Apple from './../assets/Apple.svg';
 import Arrow from './../assets/arrow-right.png';
 
 export default function Signup() {
@@ -61,7 +58,7 @@ export default function Signup() {
       } else {
         setError(data.errors || 'Signup failed.');
       }
-    } catch (err) {
+    } catch {
       setError('Signup failed.');
     }
   };
@@ -89,7 +86,7 @@ export default function Signup() {
       } else {
         setError(data.errors || 'OTP verification failed.');
       }
-    } catch (err) {
+    } catch {
       setError('OTP verification failed.');
     }
   };
@@ -106,7 +103,7 @@ export default function Signup() {
           <div>
             <div className='signupheads'>
               <div className='head1'>CREATE AN ACCOUNT</div>
-              <div className='head2'>Let's get you started</div>
+              <div className='head2'>Start here</div>
             </div>
             <form onSubmit={handleSubmit} className='inputs-form'>
               <div className='input-order'>
@@ -152,6 +149,8 @@ export default function Signup() {
         )}
         <div className='signupheads'>
   {error && <div className='head2' style={{ color: 'red' }}>{error}</div>}
+  {message && <div className='head2' style={{ color: 'green' }}>{message}</div>}
+
 </div>
 
       </div>
