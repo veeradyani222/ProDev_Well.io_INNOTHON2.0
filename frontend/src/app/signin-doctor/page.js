@@ -48,7 +48,7 @@ export default function DoctorSignIn() {
 
       <div className='signup-container'>
         <div className='signupheads'>
-          <div className='head1'>WELCOME BACK EXCLUSIVE MEMBER</div>
+          <div className='head1'>WELCOME BACK</div>
           <div className='head2'>Sign in to continue</div>
         </div>
 
@@ -74,7 +74,7 @@ export default function DoctorSignIn() {
 
         <div className='oruseconts'>
           <div className='oruse'>
-            <Link href="/ForgotPassword" className='forgot-password'>Having Issues with your password?</Link>
+            <Link href="/ForgotPasswordDoctor" className='forgot-password'>Having Issues with your password?</Link>
           </div>
         </div>
 

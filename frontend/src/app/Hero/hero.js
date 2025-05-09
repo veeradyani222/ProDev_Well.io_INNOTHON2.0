@@ -2,6 +2,7 @@
 import './hero.css';
 import React from 'react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import Link from 'next/link';
 
 export default function Hero() {
  return (
@@ -13,8 +14,7 @@ export default function Hero() {
       WELL.IO is transforming healthcare with cutting-edge AI that monitors patient health in real time—whether in hospitals, clinics, or at home. We deliver instant insights, predictive alerts, and a seamless experience for care teams and families alike.
      </p>
      <div className="hero-buttons">
-      <button className="hero-btn primary-btn">Book a Demo</button>
-      <button className="hero-btn secondary-btn">Learn More</button>
+      <button className="hero-btn primary-btn"><Link href="/signup">Connect To Doctor</Link></button>
      </div>
     </div>
     <div className="hero-animation">

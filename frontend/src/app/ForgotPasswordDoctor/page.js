@@ -2,15 +2,15 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import "./ForgotPassword.css";
+import "./ForgotPasswordDoctor.css";
 import Arrow from "./../assets/arrow-right.png";
 
 export default function ForgotPassword() {
-  const [step, setStep] = useState("email"); // 'email', 'otpVerification', 'resetPassword'
+  const [step, setStep] = useState("email");
   const [formData, setFormData] = useState({
     email: "",
     newPassword: "",
-    confirmPassword: "", // Added for password matching
+    confirmPassword: "",
   });
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -41,14 +41,13 @@ export default function ForgotPassword() {
     }
   };
 
-  // Step 1: Send OTP
   const handleSendOtp = async (e) => {
     e.preventDefault();
     setMessage(null);
     setError(null);
 
     try {
-      const response = await fetch("https://wellio-backend.onrender.com/forgot-password", {
+      const response = await fetch("https://wellio-backend.onrender.com/doctor/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email }),
@@ -57,14 +56,13 @@ export default function ForgotPassword() {
       const data = await response.json();
       if (response.ok) {
         setMessage(data.message);
-        setResetToken(data.resetToken); // Save reset token for next step
+        setResetToken(data.resetToken);
         setStep("otpVerification");
       } else {
         setError(data.message || "Failed to send OTP.");
       }
     } catch {
       setError("Failed to send OTP.");
-
     }
   };
 
@@ -74,19 +72,19 @@ export default function ForgotPassword() {
     setError(null);
 
     try {
-      const response = await fetch("https://wellio-backend.onrender.com/verify-forgot-otp", { // Assuming separate OTP route
+      const response = await fetch("https://wellio-backend.onrender.com/doctor/verify-forgot-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           resetToken,
-          resetCode: otp.join(""), // Send only OTP & token
+          resetCode: otp.join(""),
         }),
       });
 
       const data = await response.json();
       if (response.ok) {
         setMessage("OTP Verified! Set a new password.");
-        setStep("resetPassword"); // Move to password reset step
+        setStep("resetPassword");
       } else {
         setError(data.message || "Invalid OTP.");
       }
@@ -100,18 +98,17 @@ export default function ForgotPassword() {
     setMessage(null);
     setError(null);
 
-    // Check if passwords match
     if (formData.newPassword !== formData.confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
 
     try {
-      const response = await fetch("https://doord.onrender.com/reset-password", {
+      const response = await fetch("https://doord.onrender.com/doctor/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          resetToken, // This should be stored from the forgot password step
+          resetToken,
           newPassword: formData.newPassword,
         }),
       });
@@ -128,11 +125,8 @@ export default function ForgotPassword() {
     }
   };
 
-
   return (
     <div>
-
-
       <div className="signup-container">
         {step === "email" && (
           <div>
@@ -202,13 +196,12 @@ export default function ForgotPassword() {
                 <label>Re-Enter New Password</label>
                 <input
                   type="password"
-                  name="confirmPassword"  // Changed name
-                  value={formData.confirmPassword}  // Uses confirmPassword now
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
                   onChange={handleChange}
                   required
                 />
               </div>
-
               <button className="signinbtn" type="submit">
                 <div>Reset Password</div>
                 <Image src={Arrow} alt="Go" className="social-icon" width={40} height={40} />
@@ -216,7 +209,6 @@ export default function ForgotPassword() {
             </form>
           </div>
         )}
-
 
         <div className="signupheads">
           {error && <div className="head2" style={{ color: "red" }}>{error}</div>}
