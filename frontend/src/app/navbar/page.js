@@ -84,8 +84,8 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link href='/signin' className='sign-in-btn '>Login As Doctor</Link>
-              <Link href='/signup' className='sign-up-btn'>Login As Patient</Link>
+              <Link href='/signin-doctor' className='sign-in-btn '>Login As Doctor</Link>
+              <Link href='/signin' className='sign-up-btn'>Login As Patient</Link>
             </>
           )}
         </div>
