@@ -48,7 +48,7 @@ export default function DoctorSignIn() {
 
       <div className='signup-container'>
         <div className='signupheads'>
-          <div className='head1'>WELCOME BACK</div>
+          <div className='head1'>CHECK UP ON YOUR PATIENTS</div>
           <div className='head2'>Sign in to continue</div>
         </div>
 
