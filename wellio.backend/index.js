@@ -33,7 +33,7 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cors());
 
 // MongoDB connection
-mongoose.connect('mongodb+srv://veeradyani2:S%40nju_143@cluster0.uafyz.mongodb.net/Doord?retryWrites=true&w=majority');
+mongoose.connect('mongodb+srv://veeradyani2:S%40nju_143@cluster0.uafyz.mongodb.net/wellio?retryWrites=true&w=majority');
 
 
 app.get("/", (req, res) => {
@@ -726,36 +726,36 @@ app.post("/doctor/reset-password", async (req, res) => {
 
 
 const users = [
-    {
-        name: "Veer Adyani",
-        email: "veeradyani12@gmail.com",
-        gender: "Male",
-        age: 20
-    },
-    {
-        name: "Aarav Mehta",
-        email: "veeradyani2@gmail.com",
-        gender: "Male",
-        age: 22
-    },
-    {
-        name: "Priya Sharma",
-        email: "vwork108@gmail.com",
-        gender: "Female",
-        age: 24
-    },
-    {
-        name: "Vaidik Sule",
-        email: "vaidiksule@gmail.com",
-        gender: "Male",
-        age: 21
-    },
-    {
-        name: "Ishita Sule",
-        email: "vaidiksulemusic@gmail.com",
-        gender: "Female",
-        age: 23
-    }
+  {
+    name: "Veer Adyani",
+    email: "veeradyani12@gmail.com",
+    gender: "Male",
+    age: 20
+  },
+  {
+    name: "Shorya Jain",
+    email: "shorya1016@gmail.com",
+    gender: "Female",
+    age: 22
+  },
+  {
+    name: "Priya Sharma",
+    email: "shorya.2098@gmail.com",
+    gender: "Female",
+    age: 24
+  },
+  {
+    name: "Vaidik Sule",
+    email: "vaidiksule@gmail.com",
+    gender: "Male",
+    age: 21
+  },
+  {
+    name: "Ishita Sule",
+    email: "vaidiksulemusic@gmail.com",
+    gender: "Female",
+    age: 23
+  }
 ];
 
 // Generate random vitals
