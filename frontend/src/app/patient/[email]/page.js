@@ -24,7 +24,7 @@ const PatientProfile = () => {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch('https://wellio-backend.onrender.com/api/vitals');
+        const response = await fetch('http://localhost:4000/api/vitals');
         if (!response.ok) {
           throw new Error('Failed to fetch vitals data');
         }

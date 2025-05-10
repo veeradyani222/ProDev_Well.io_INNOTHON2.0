@@ -23,6 +23,7 @@ export default function Dashboard() {
   const [aiTip, setAiTip] = useState('');
   const [aiSummary, setAiSummary] = useState('');
   const [doctor, setDoctor] = useState(null);
+  const [vitalsSnapshot, setVitalsSnapshot] = useState(null);
 
   // Update snapshot every 10 minutes
   useEffect(() => {
