@@ -115,61 +115,61 @@ const Users = mongoose.model('Users', new mongoose.Schema({
 const pendingVerifications = {}; // Store pending email verifications
 
 app.post('/signup', async (req, res) => {
-  try {
-    const { name, email, password, doctor, status, address } = req.body;
+    try {
+        const { name, email, password, doctor, status, address } = req.body;
 
-    // Validate required fields
-    if (!name || !email || !password || !doctor || !address) {
-      return res.status(400).json({ success: false, errors: "All fields are required." });
-    }
+        // Validate required fields
+        if (!name || !email || !password || !doctor || !address) {
+            return res.status(400).json({ success: false, errors: "All fields are required." });
+        }
 
-    // Check for existing user
-    const existingUser = await Users.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ success: false, errors: "Email is already registered." });
-    }
+        // Check for existing user
+        const existingUser = await Users.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ success: false, errors: "Email is already registered." });
+        }
 
-    // Check if doctor exists
-    const doctorUser = await Doctors.findOne({ email: doctor });
-    if (!doctorUser) {
-      return res.status(404).json({ success: false, errors: "Doctor not found." });
-    }
+        // Check if doctor exists
+        const doctorUser = await Doctors.findOne({ email: doctor });
+        if (!doctorUser) {
+            return res.status(404).json({ success: false, errors: "Doctor not found." });
+        }
 
-    // Generate verification code
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        // Generate verification code
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Temporarily store user info
-    pendingVerifications[email] = {
-      name,
-      email,
-      password,
-      status,
-      doctor,
-      address,
-      verificationCode,
-      createdAt: Date.now()
-    };
+        // Temporarily store user info
+        pendingVerifications[email] = {
+            name,
+            email,
+            password,
+            status,
+            doctor,
+            address,
+            verificationCode,
+            createdAt: Date.now()
+        };
 
-    // Add patient to doctor's patients array if not already present
-    if (!doctorUser.patients.includes(email)) {
-      doctorUser.patients.push(email);
-      await doctorUser.save();
-    }
+        // Add patient to doctor's patients array if not already present
+        if (!doctorUser.patients.includes(email)) {
+            doctorUser.patients.push(email);
+            await doctorUser.save();
+        }
 
-    // Send verification email
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+        // Send verification email
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Welcome to Wellio – Verify Your Email',
-      html: `
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Welcome to Wellio – Verify Your Email',
+            html: `
       <html>
         <body style="background-color: #1d3c34; color: white; font-family: Arial, sans-serif; padding: 20px;">
           <h1 style="color: #4CAF50;">Welcome to Wellio, ${name}!</h1>
@@ -183,14 +183,14 @@ app.post('/signup', async (req, res) => {
         </body>
       </html>
       `
-    });
+        });
 
-    res.json({ success: true, message: "Please verify your email address." });
+        res.json({ success: true, message: "Please verify your email address." });
 
-  } catch (error) {
-    console.error("Error during signup:", error);
-    res.status(500).json({ error: "Signup failed." });
-  }
+    } catch (error) {
+        console.error("Error during signup:", error);
+        res.status(500).json({ error: "Signup failed." });
+    }
 });
 
 
@@ -781,121 +781,121 @@ app.get('/alldoctors', async (req, res) => {
 
 
 const users = [
-  {
-    name: "Veer Adyani",
-    email: "veeradyani12@gmail.com",
-    gender: "Male",
-    age: 20,
-    height: 170,
-    weight: 60,
-    bloodGroup: "O+",
-    allergies: "None",
-    medications: "None",
-    medicalHistory: "None",
-    familyHistory: "None",
-    lifestyle: "Active",
-    sleep: "7 hours",
-    diet: "Balanced",
-    exercise: "Regular",
-    stressLevel: "Low",
-    hydration: "Adequate",
-    smoking: "No",
-    alcohol: "No",
-    caffeine: "Moderate",
-    screenTime: "2 hours"
-  },
-  {
-    name: "Shorya Jain",
-    email: "shorya1016@gmail.com",
-    gender: "Female",
-    age: 22,
-    height: 160,
-    weight: 55,
-    bloodGroup: "A+",
-    allergies: "Pollen",
-    medications: "Antihistamines",
-    medicalHistory: "Asthma",
-    familyHistory: "Diabetes",
-    lifestyle: "Moderate",
-    sleep: "6 hours",
-    diet: "Vegetarian",
-    exercise: "Occasional",
-    stressLevel: "Medium",
-    hydration: "Low",
-    smoking: "No",
-    alcohol: "Occasionally",
-    caffeine: "Low",
-    screenTime: "5 hours"
-  },
-  {
-    name: "Priya Sharma",
-    email: "shorya.2098@gmail.com",
-    gender: "Female",
-    age: 24,
-    height: 165,
-    weight: 58,
-    bloodGroup: "B+",
-    allergies: "Dust",
-    medications: "None",
-    medicalHistory: "Migraines",
-    familyHistory: "Hypertension",
-    lifestyle: "Active",
-    sleep: "8 hours",
-    diet: "Balanced",
-    exercise: "Regular",
-    stressLevel: "Low",
-    hydration: "High",
-    smoking: "No",
-    alcohol: "No",
-    caffeine: "High",
-    screenTime: "3 hours"
-  },
-  {
-    name: "Vaidik Sule",
-    email: "vaidiksule@gmail.com",
-    gender: "Male",
-    age: 21,
-    height: 175,
-    weight: 70,
-    bloodGroup: "AB+",
-    allergies: "None",
-    medications: "None",
-    medicalHistory: "None",
-    familyHistory: "Heart Disease",
-    lifestyle: "Sedentary",
-    sleep: "5 hours",
-    diet: "High-Protein",
-    exercise: "Rare",
-    stressLevel: "High",
-    hydration: "Low",
-    smoking: "Yes",
-    alcohol: "Yes",
-    caffeine: "High",
-    screenTime: "7 hours"
-  },
-  {
-    name: "Ishita Sule",
-    email: "vaidiksulemusic@gmail.com",
-    gender: "Female",
-    age: 23,
-    height: 162,
-    weight: 52,
-    bloodGroup: "O-",
-    allergies: "Nuts",
-    medications: "Epinephrine",
-    medicalHistory: "Allergies",
-    familyHistory: "None",
-    lifestyle: "Active",
-    sleep: "7.5 hours",
-    diet: "Gluten-Free",
-    exercise: "Regular",
-    stressLevel: "Medium",
-    hydration: "Adequate",
-    smoking: "No",
-    alcohol: "Rarely",
-    caffeine: "Low",
-    screenTime: "4 hours"
-  }
+    {
+        name: "Veer Adyani",
+        email: "veeradyani12@gmail.com",
+        gender: "Male",
+        age: 20,
+        height: 170,
+        weight: 60,
+        bloodGroup: "O+",
+        allergies: "None",
+        medications: "None",
+        medicalHistory: "None",
+        familyHistory: "None",
+        lifestyle: "Active",
+        sleep: "7 hours",
+        diet: "Balanced",
+        exercise: "Regular",
+        stressLevel: "Low",
+        hydration: "Adequate",
+        smoking: "No",
+        alcohol: "No",
+        caffeine: "Moderate",
+        screenTime: "2 hours"
+    },
+    {
+        name: "Shorya Jain",
+        email: "shorya1016@gmail.com",
+        gender: "Female",
+        age: 22,
+        height: 160,
+        weight: 55,
+        bloodGroup: "A+",
+        allergies: "Pollen",
+        medications: "Antihistamines",
+        medicalHistory: "Asthma",
+        familyHistory: "Diabetes",
+        lifestyle: "Moderate",
+        sleep: "6 hours",
+        diet: "Vegetarian",
+        exercise: "Occasional",
+        stressLevel: "Medium",
+        hydration: "Low",
+        smoking: "No",
+        alcohol: "Occasionally",
+        caffeine: "Low",
+        screenTime: "5 hours"
+    },
+    {
+        name: "Priya Sharma",
+        email: "shorya.2098@gmail.com",
+        gender: "Female",
+        age: 24,
+        height: 165,
+        weight: 58,
+        bloodGroup: "B+",
+        allergies: "Dust",
+        medications: "None",
+        medicalHistory: "Migraines",
+        familyHistory: "Hypertension",
+        lifestyle: "Active",
+        sleep: "8 hours",
+        diet: "Balanced",
+        exercise: "Regular",
+        stressLevel: "Low",
+        hydration: "High",
+        smoking: "No",
+        alcohol: "No",
+        caffeine: "High",
+        screenTime: "3 hours"
+    },
+    {
+        name: "Vaidik Sule",
+        email: "vaidiksule@gmail.com",
+        gender: "Male",
+        age: 21,
+        height: 175,
+        weight: 70,
+        bloodGroup: "AB+",
+        allergies: "None",
+        medications: "None",
+        medicalHistory: "None",
+        familyHistory: "Heart Disease",
+        lifestyle: "Sedentary",
+        sleep: "5 hours",
+        diet: "High-Protein",
+        exercise: "Rare",
+        stressLevel: "High",
+        hydration: "Low",
+        smoking: "Yes",
+        alcohol: "Yes",
+        caffeine: "High",
+        screenTime: "7 hours"
+    },
+    {
+        name: "Ishita Sule",
+        email: "vaidiksulemusic@gmail.com",
+        gender: "Female",
+        age: 23,
+        height: 162,
+        weight: 52,
+        bloodGroup: "O-",
+        allergies: "Nuts",
+        medications: "Epinephrine",
+        medicalHistory: "Allergies",
+        familyHistory: "None",
+        lifestyle: "Active",
+        sleep: "7.5 hours",
+        diet: "Gluten-Free",
+        exercise: "Regular",
+        stressLevel: "Medium",
+        hydration: "Adequate",
+        smoking: "No",
+        alcohol: "Rarely",
+        caffeine: "Low",
+        screenTime: "4 hours"
+    }
 ];
 
 
@@ -905,39 +905,52 @@ let lastUpdateTime = 0;
 const UPDATE_INTERVAL = 90 * 1000; // 1.5 minutes
 
 function getStableVitals(user) {
-  return {
-    ...user,
-    vitals: {
-      bloodPressure: `${getRandomInRange(110, 120)}/${getRandomInRange(70, 80)}`,
-      oxygenLevel: getRandomInRange(96, 100),
-      heartbeat: getRandomInRange(60, 100),
-      temperature: getRandomInRange(97, 99),
-      breathingRate: getRandomInRange(12, 18),
-      heartRateVariability: getRandomInRange(40, 80),
-      vo2Max: getRandomInRange(35, 45),
-      sleepDuration: getRandomInRange(7, 8.5), // average per day
-      steps: user.vitals?.steps ? user.vitals.steps + getRandomInRange(10, 50) : getRandomInRange(1000, 3000),
-      caloriesBurned: user.vitals?.caloriesBurned ? user.vitals.caloriesBurned + getRandomInRange(20, 50) : getRandomInRange(500, 800),
-      noiseLevel: getRandomInRange(30, 70)
-    }
-  };
+    return {
+        ...user,
+        vitals: {
+            bloodPressure: `${getRandomInRange(110, 120)}/${getRandomInRange(70, 80)}`,
+            oxygenLevel: getRandomInRange(96, 100),
+            heartbeat: getRandomInRange(60, 100),
+            temperature: getRandomInRange(97, 99),
+            breathingRate: getRandomInRange(12, 18),
+            heartRateVariability: getRandomInRange(40, 80),
+            vo2Max: getRandomInRange(35, 45),
+            sleepDuration: getRandomInRange(7, 8.5), // average per day
+            steps: user.vitals?.steps ? user.vitals.steps + getRandomInRange(10, 50) : getRandomInRange(1000, 3000),
+            caloriesBurned: user.vitals?.caloriesBurned ? user.vitals.caloriesBurned + getRandomInRange(20, 50) : getRandomInRange(500, 800),
+            noiseLevel: getRandomInRange(30, 70)
+        }
+    };
 }
 
 function getRandomInRange(min, max) {
-  return +(Math.random() * (max - min) + min).toFixed(1);
+    return +(Math.random() * (max - min) + min).toFixed(1);
 }
 
 function getUserVitals() {
-  const now = Date.now();
-  if (!cachedVitals.length || now - lastUpdateTime > UPDATE_INTERVAL) {
-    cachedVitals = users.map(user => getStableVitals(user));
-    lastUpdateTime = now;
-  }
-  return cachedVitals;
-}
+    return users.map(user => {
+        return {
+            ...user,
+            vitals: {
+                bloodPressure: `${Math.floor(getRandomVital({ min: 90, max: 120, abnormalMin: { min: 70, max: 89 }, abnormalMax: { min: 121, max: 160 } }))}/${Math.floor(getRandomVital({ min: 60, max: 80, abnormalMin: { min: 40, max: 59 }, abnormalMax: { min: 81, max: 100 } }))}`,
+                oxygenLevel: getRandomVital({ min: 95, max: 100, abnormalMin: { min: 80, max: 89 }, abnormalMax: { min: 101, max: 105 } }),
+                heartbeat: getRandomVital({ min: 60, max: 100, abnormalMin: { min: 30, max: 59 }, abnormalMax: { min: 101, max: 150 } }),
+                temperature: getRandomVital({ min: 97, max: 99, abnormalMin: { min: 95, max: 96.9 }, abnormalMax: { min: 99.1, max: 103 } }),
+                breathingRate: getRandomVital({ min: 12, max: 20, abnormalMin: { min: 6, max: 11 }, abnormalMax: { min: 21, max: 30 } }),
+                heartRateVariability: getRandomVital({ min: 20, max: 100, abnormalMin: { min: 5, max: 19 }, abnormalMax: { min: 101, max: 150 } }), // ms
+                vo2Max: getRandomVital({ min: 35, max: 50, abnormalMin: { min: 20, max: 34 }, abnormalMax: { min: 51, max: 70 } }), // ml/kg/min
+                sleepDuration: getRandomVital({ min: 6, max: 9, abnormalMin: { min: 3, max: 5.9 }, abnormalMax: { min: 9.1, max: 12 } }), // in hours
+                steps: Math.floor(getRandomVital({ min: 5000, max: 12000, abnormalMin: { min: 0, max: 4999 }, abnormalMax: { min: 12001, max: 20000 } })), // steps
+                caloriesBurned: Math.floor(getRandomVital({ min: 1500, max: 2500, abnormalMin: { min: 800, max: 1499 }, abnormalMax: { min: 2501, max: 3500 } })), // kcal
+                noiseLevel: getRandomVital({ min: 30, max: 80, abnormalMin: { min: 10, max: 29 }, abnormalMax: { min: 81, max: 100 } }) // dB
+            }
+        };
+    });
+};
+
 
 app.get('/api/vitals', (req, res) => {
-  res.json(getUserVitals());
+    res.json(getUserVitals());
 });
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -945,16 +958,16 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const userLastRequest = new Map();
 
 app.post('/api/test-ai', async (req, res) => {
-  const { vitals, staticData } = req.body;
+    const { vitals, staticData } = req.body;
 
-  if (!vitals || !staticData) {
-    return res.status(400).json({ error: 'Missing required data' });
-  }
+    if (!vitals || !staticData) {
+        return res.status(400).json({ error: 'Missing required data' });
+    }
 
-  try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    try {
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-    const prompt = `
+        const prompt = `
 You're a virtual health assistant. Based on the following patient information, provide:
 
 1. A brief health **overview**.
@@ -991,40 +1004,40 @@ Abnormalities: ...
 Tip: ...
 `;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
 
-    const [overview, abnormalities, tip] = text.split(/Overview:|Abnormalities:|Tip:/)
-      .map(s => s?.trim())
-      .filter(Boolean);
+        const [overview, abnormalities, tip] = text.split(/Overview:|Abnormalities:|Tip:/)
+            .map(s => s?.trim())
+            .filter(Boolean);
 
-    return res.json({
-      overview,
-      abnormalities,
-      tip
-    });
-  } catch (error) {
-    console.error('Gemini API error:', error.message);
-    return res.status(500).json({
-      error: 'AI service unavailable',
-      details: error.message
-    });
-  }
+        return res.json({
+            overview,
+            abnormalities,
+            tip
+        });
+    } catch (error) {
+        console.error('Gemini API error:', error.message);
+        return res.status(500).json({
+            error: 'AI service unavailable',
+            details: error.message
+        });
+    }
 });
 
 
 app.post('/api/doctor-insights', async (req, res) => {
-  const { vitals, staticData } = req.body;
+    const { vitals, staticData } = req.body;
 
-  if (!vitals || !staticData) {
-    return res.status(400).json({ error: 'Missing required patient data' });
-  }
+    if (!vitals || !staticData) {
+        return res.status(400).json({ error: 'Missing required patient data' });
+    }
 
-  try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    try {
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-    const prompt = ` 
+        const prompt = ` 
 You are a medical AI assistant providing detailed insights to a doctor about their patient. 
 Analyze the following patient data and provide a structured response with key findings (please do not use any bold letters or bullet points, keep the text very plain).:
 
@@ -1078,66 +1091,66 @@ Provide your analysis in this exact format (keep each section concise but compre
 - [Any red flags to watch for]
 `;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
 
-    // More robust parsing function
-    const parseInsights = (text) => {
-      const sections = {
-        summary: '',
-        abnormalities: '',
-        risks: '',
-        actions: '',
-        followup: ''
-      };
+        // More robust parsing function
+        const parseInsights = (text) => {
+            const sections = {
+                summary: '',
+                abnormalities: '',
+                risks: '',
+                actions: '',
+                followup: ''
+            };
 
-      // Split by numbered sections first
-      const sectionPattern = /\n\n\d\./g;
-      const parts = text.split(sectionPattern);
-      
-      // If we got the expected 5 parts (0-4)
-      if (parts.length >= 5) {
-        return {
-          summary: parts[0].replace('1. Key Health Summary', '').trim(),
-          abnormalities: parts[1].replace('2. Notable Abnormalities', '').trim(),
-          risks: parts[2].replace('3. Risk Factors', '').trim(),
-          actions: parts[3].replace('4. Recommended Actions', '').trim(),
-          followup: parts[4].replace('5. Follow-up Considerations', '').trim()
+            // Split by numbered sections first
+            const sectionPattern = /\n\n\d\./g;
+            const parts = text.split(sectionPattern);
+
+            // If we got the expected 5 parts (0-4)
+            if (parts.length >= 5) {
+                return {
+                    summary: parts[0].replace('1. Key Health Summary', '').trim(),
+                    abnormalities: parts[1].replace('2. Notable Abnormalities', '').trim(),
+                    risks: parts[2].replace('3. Risk Factors', '').trim(),
+                    actions: parts[3].replace('4. Recommended Actions', '').trim(),
+                    followup: parts[4].replace('5. Follow-up Considerations', '').trim()
+                };
+            }
+
+            // Fallback: Try to find each section independently
+            const findSection = (title) => {
+                const regex = new RegExp(`${title}[\\s\\S]*?(?=\\n\\n\\d\\.|$)`, 'i');
+                const match = text.match(regex);
+                return match ? match[0].replace(title, '').trim() : '';
+            };
+
+            return {
+                summary: findSection('1. Key Health Summary') || 'No summary available',
+                abnormalities: findSection('2. Notable Abnormalities') || 'No abnormalities detected',
+                risks: findSection('3. Risk Factors') || 'No significant risk factors',
+                actions: findSection('4. Recommended Actions') || 'No specific recommendations',
+                followup: findSection('5. Follow-up Considerations') || 'Standard monitoring recommended'
+            };
         };
-      }
 
-      // Fallback: Try to find each section independently
-      const findSection = (title) => {
-        const regex = new RegExp(`${title}[\\s\\S]*?(?=\\n\\n\\d\\.|$)`, 'i');
-        const match = text.match(regex);
-        return match ? match[0].replace(title, '').trim() : '';
-      };
+        const insights = parseInsights(text);
 
-      return {
-        summary: findSection('1. Key Health Summary') || 'No summary available',
-        abnormalities: findSection('2. Notable Abnormalities') || 'No abnormalities detected',
-        risks: findSection('3. Risk Factors') || 'No significant risk factors',
-        actions: findSection('4. Recommended Actions') || 'No specific recommendations',
-        followup: findSection('5. Follow-up Considerations') || 'Standard monitoring recommended'
-      };
-    };
+        return res.json({
+            success: true,
+            insights,
+            lastUpdated: new Date().toISOString()
+        });
 
-    const insights = parseInsights(text);
-
-    return res.json({
-      success: true,
-      insights,
-      lastUpdated: new Date().toISOString()
-    });
-
-  } catch (error) {
-    console.error('Doctor insights error:', error);
-    return res.status(500).json({
-      error: 'Failed to generate medical insights',
-      details: error.message
-    });
-  }
+    } catch (error) {
+        console.error('Doctor insights error:', error);
+        return res.status(500).json({
+            error: 'Failed to generate medical insights',
+            details: error.message
+        });
+    }
 });
 
 app.listen(port, (error) => {

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';  // Import useRouter
-import jwt from 'jsonwebtoken';  // For decoding the token
+import { useRouter } from 'next/navigation';
+import jwt from 'jsonwebtoken';
 import Image from 'next/image';
 import Link from 'next/link';
 import Logo from './../assets/wellio-logo.svg';
@@ -13,16 +13,15 @@ import './Navbar.css';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [userRole, setUserRole] = useState('');  // Store the role (Patient/Doctor)
-  const [isClient, setIsClient] = useState(false);  // State to track if the component is mounted
+  const [userRole, setUserRole] = useState('');
+  const [isClient, setIsClient] = useState(false);
   const pathname = usePathname();
-  
-  // UseEffect to ensure the component is mounted before using useRouter
+
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const router = useRouter();  // Use router only when component is mounted
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUserRole = async () => {
@@ -30,9 +29,9 @@ const Navbar = () => {
       if (!token) return;
 
       try {
-        const decoded = jwt.decode(token);  // Decode the JWT token
+        const decoded = jwt.decode(token);
         if (decoded && decoded.user) {
-          setUserRole(decoded.user.appUser);  // Set the user's role (Patient/Doctor)
+          setUserRole(decoded.user.appUser);
         }
       } catch (err) {
         console.error('Failed to decode token:', err);
@@ -43,20 +42,19 @@ const Navbar = () => {
   }, []);
 
   const handleSignOut = () => {
-    localStorage.removeItem("token");  // Remove token from local storage
-    setUserRole('');  // Reset user role
-    router.push('/');  // Redirect to homepage after logout
+    localStorage.removeItem("token");
+    setUserRole('');
+    router.push('/');
   };
 
   const handleDashboardRedirect = () => {
     if (userRole === 'Patient') {
-      router.push('/PatientDashboard');  // Redirect to Patient Dashboard
+      router.push('/PatientDashboard');
     } else if (userRole === 'Doctor') {
-      router.push('/DoctorDashboard');  // Redirect to Doctor Dashboard
+      router.push('/DoctorDashboard');
     }
   };
 
-  // Only render the component if it's mounted (client-side)
   if (!isClient) return null;
 
   return (
@@ -67,11 +65,13 @@ const Navbar = () => {
         </Link>
       </div>
 
-      {/* Desktop Navigation */}
-      <div className='navbar-center desktop-only'>
-        <Link href='/' className={`nav-link ${pathname === '/' ? 'active' : ''}`}>Home</Link>
-        <Link href='/contact' className={`nav-link ${pathname === '/contact' ? 'active' : ''}`}>Contact Us</Link>
-      </div>
+      {/* Desktop Navigation - Only show if not logged in as patient */}
+      {!userRole && (
+        <div className='navbar-center desktop-only'>
+          <Link href='/' className={`nav-link ${pathname === '/' ? 'active' : ''}`}>Home</Link>
+          <Link href='/contact' className={`nav-link ${pathname === '/contact' ? 'active' : ''}`}>Contact Us</Link>
+        </div>
+      )}
 
       <div className='navbar-right'>
         {/* Desktop Auth Section */}
@@ -84,7 +84,7 @@ const Navbar = () => {
           ) : (
             <>
               <Link href='/signin-doctor' className='sign-in-btn'>Login As Doctor</Link>
-            <Link href='/signin' className='sign-up-btn'>Login As Patient</Link>
+              <Link href='/signin' className='sign-up-btn'>Login As Patient</Link>
             </>
           )}
         </div>
@@ -98,10 +98,14 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile Navigation Menu */}
+      {/* Mobile Navigation Menu - Only show Home/Contact if not logged in */}
       <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
-        <Link href='/' className={`mobile-nav-link ${pathname === '/' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Home</Link>
-        <Link href='/contact' className={`mobile-nav-link ${pathname === '/contact' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Contact Us</Link>
+        {!userRole && (
+          <>
+            <Link href='/' className={`mobile-nav-link ${pathname === '/' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Home</Link>
+            <Link href='/contact' className={`mobile-nav-link ${pathname === '/contact' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Contact Us</Link>
+          </>
+        )}
 
         <div className='mobile-auth-buttons'>
           {userRole ? (
