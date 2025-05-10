@@ -11,6 +11,7 @@ const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 const cloudinary = require('cloudinary').v2;
 require('dotenv').config();
+const { Configuration, OpenAIApi } = require('openai');
 
 
 
@@ -918,6 +919,55 @@ function getUserVitals() {
 
 app.get('/api/vitals', (req, res) => {
     res.json(getUserVitals());
+});
+
+
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
+
+app.post('/api/get-health-ai', async (req, res) => {
+  const { vitalsHistory, staticData } = req.body;
+
+  if (!vitalsHistory || !staticData) {
+    return res.status(400).json({ error: 'Missing vitals or static data' });
+  }
+
+  const tipPrompt = `
+You are a health assistant. Based on this 10-minute rolling vitals data:\n
+${JSON.stringify(vitalsHistory, null, 2)}\n
+Give a short, friendly, personalized one-sentence health tip.
+`;
+
+  const summaryPrompt = `
+You are a smart health analyst. Based on the vitals:\n
+${JSON.stringify(vitalsHistory, null, 2)}\n
+and static patient data (like allergies, diet, exercise, lifestyle):\n
+${JSON.stringify(staticData, null, 2)}\n
+Give a short summary of their health in two sentences and suggest one improvement.
+`;
+
+  try {
+    const [tipResponse, summaryResponse] = await Promise.all([
+      openai.createChatCompletion({
+        model: 'gpt-4',
+        messages: [{ role: 'user', content: tipPrompt }],
+      }),
+      openai.createChatCompletion({
+        model: 'gpt-4',
+        messages: [{ role: 'user', content: summaryPrompt }],
+      }),
+    ]);
+
+    const tip = tipResponse.data.choices[0].message.content.trim();
+    const summary = summaryResponse.data.choices[0].message.content.trim();
+
+    return res.json({ tip, summary });
+  } catch (error) {
+    console.error('OpenAI API error:', error.message);
+    return res.status(500).json({ error: 'Failed to generate AI response' });
+  }
 });
 
 app.listen(port, (error) => {

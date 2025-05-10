@@ -1,106 +1,147 @@
-:root {
- --primary-color: #3f7d58;
- --secondary-color: #E4EFE7;
- --background-color: #FDFAF6;
- --text-color: #333;
- --text-muted: #666;
- --white: #ffffff;
- --hover-color: #53a173;
- --font-family: "Inter", sans-serif;
-}
 
-body {
- font-family: var(--font-family);
- background-color: var(--background-color);
- color: var(--text-color);
-}
 
 .dashboard {
- display: flex;
- justify-content: space-between;
- padding: 20px;
- gap: 20px;
+  display: flex;
+  flex-direction: column;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 3vh 5vw;
+  gap: 4vh;
+  min-height: 100vh;
+}
+
+@media (min-width: 768px) {
+  .dashboard {
+    flex-direction: row;
+  }
 }
 
 .left-side {
- width: 60%;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .left-side {
+    width: 70vw;
+  }
 }
 
 .right-side {
- width: 35%;
- background-color: var(--white);
- padding: 20px;
- box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
- border-radius: 8px;
+  width: 100%;
+  margin-top: 4vh;
+}
+
+@media (min-width: 768px) {
+  .right-side {
+    width: 25vw;
+    position: sticky;
+    top: 5vh;
+    height: fit-content;
+  }
+}
+
+h1 {
+  font-size: 2.5vh;
+  color: #003366;
+  margin-bottom: 2vh;
+}
+
+.user-info {
+  background-color: #fff;
+  padding: 2vh 2vw;
+  border-radius: 1.2vh;
+  box-shadow: 0 0.4vh 1vh rgba(0, 0, 0, 0.08);
+  margin-bottom: 3vh;
+}
+
+.user-info p {
+  font-size: 1.8vh;
+  margin: 1vh 0;
 }
 
 .card-grid {
- display: grid;
- grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
- gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 3vh;
+}
+
+.vital-group {
+  background-color: #fff;
+  padding: 2.5vh 2vw;
+  border-radius: 1vh;
+  box-shadow: 0 0.5vh 1.2vh rgba(0, 0, 0, 0.08);
+}
+
+.vital-group h2 {
+  font-size: 2vh;
+  margin-bottom: 2vh;
+  padding-left: 1vw;
+  border-left: 0.8vw solid #007bff;
+}
+
+.basic-info h2 { border-color: #28a745; }
+.health-history h2 { border-color: #ffc107; }
+.lifestyle-info h2 { border-color: #007bff; }
+.live-vitals h2 { border-color: #dc3545; }
+
+.vital-card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20vw, 1fr));
+  gap: 1.5vw;
 }
 
 .vital-card {
- background-color: var(--secondary-color);
- padding: 15px;
- border-radius: 10px;
- box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
- transition: transform 0.2s ease;
+  padding: 2vh 2vw;
+  border: 1px solid #ddd;
+  border-radius: 1vw;
+  background-color: #fff;
+  box-shadow: 0 0.5vh 1vh rgba(0, 0, 0, 0.05);
 }
 
-.vital-card:hover {
- transform: scale(1.03);
+.vital-label {
+  font-size: 1vw;
+  color: #666;
+  font-weight: 400; /* light or regular */
+  margin-bottom: 0.5vh;
 }
 
-.card-header {
- font-size: 1.1rem;
- font-weight: bold;
- margin-bottom: 5px;
+.vital-value {
+  font-size: 1.3vw;
+  font-weight: 700;
+  color: #111;
+  font-family: 'Segoe UI', sans-serif; /* Or something visually distinct */
 }
 
-.card-body {
- font-size: 1rem;
- color: var(--text-muted);
+
+.doctor-info {
+  background-color: #fff;
+  padding: 2vh 2vw;
+  border-radius: 1vh;
+  box-shadow: 0 0.5vh 1.2vh rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
 .doctor-info h3 {
- font-size: 1.5rem;
- color: var(--primary-color);
- margin-bottom: 10px;
+  font-size: 2vh;
+  margin-bottom: 1vh;
+  color: #005c99;
 }
 
 .doctor-info p {
- font-size: 1rem;
- margin-bottom: 10px;
+  font-size: 1.6vh;
+  margin-bottom: 1vh;
 }
 
 .talk-button {
- padding: 10px 20px;
- background-color: var(--primary-color);
- color: var(--white);
- border: none;
- border-radius: 8px;
- cursor: pointer;
- font-size: 1rem;
- transition: background-color 0.3s;
+  padding: 1vh 2vw;
+  font-size: 1.7vh;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 0.8vh;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .talk-button:hover {
- background-color: var(--hover-color);
-}
-
-/* Responsive Styling for Mobile Devices */
-@media (max-width: 768px) {
- .dashboard {
-  flex-direction: column;
- }
-
- .left-side,
- .right-side {
-  width: 100%;
- }
-
- .card-grid {
-  grid-template-columns: 1fr;
- }
+  background-color: #0056b3;
 }
