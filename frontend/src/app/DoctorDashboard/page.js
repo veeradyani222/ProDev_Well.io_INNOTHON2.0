@@ -2,7 +2,7 @@
 
 
 
-const Footer = () => {
+const Docto = () => {
   return (
     <>
         <div className="main">

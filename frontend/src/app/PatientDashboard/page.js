@@ -1,5 +1,5 @@
-'use client'
-import { useState, useEffect, useCallback } from 'react';
+'use client';
+import { useEffect, useState } from 'react';
 import jwt from 'jsonwebtoken';
 import "./PatientDashboard.css";
 
@@ -8,101 +8,78 @@ export default function Dashboard() {
   const [vitals, setVitals] = useState(null);
   const [aiTip, setAiTip] = useState('');
   const [aiSummary, setAiSummary] = useState('');
-  const [lastFetchTime, setLastFetchTime] = useState(0); // Track last fetch time
 
-  // Memoized fetch functions to prevent unnecessary recreations
-  const fetchVitalsData = useCallback(async (email) => {
-    try {
-      const vitalsRes = await fetch('https://wellio-backend.onrender.com/api/vitals');
-      const vitalsData = await vitalsRes.json();
-      const foundVitals = vitalsData.find(v => v.email === email);
-      setVitals(foundVitals || null);
-
-      if (foundVitals) {
-        fetchAIData(foundVitals);
-      }
-
-      // Update last fetch time
-      setLastFetchTime(Date.now());
-
-    } catch (error) {
-      console.error('❗ Error fetching vitals:', error);
-    }
-  }, []);
-
-  const fetchAIData = useCallback(async (vitals) => {
-    try {
-      const vitalsHistory = vitals.history?.slice(-10) || [];
-      const staticData = {
-        allergies: vitals.allergies,
-        medications: vitals.medications,
-        medicalHistory: vitals.medicalHistory,
-        familyHistory: vitals.familyHistory,
-        lifestyle: vitals.lifestyle,
-        sleep: vitals.sleep,
-        diet: vitals.diet,
-        exercise: vitals.exercise,
-        stressLevel: vitals.stressLevel,
-        hydration: vitals.hydration,
-        smoking: vitals.smoking,
-        alcohol: vitals.alcohol,
-        caffeine: vitals.caffeine,
-        screenTime: vitals.screenTime,
-      };
-
-      const res = await fetch('https://wellio-backend.onrender.com/api/get-health-ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vitalsHistory, staticData }),
-      });
-
-      const data = await res.json();
-      setAiTip(data.tip);
-      setAiSummary(data.summary);
-
-    } catch (error) {
-      console.error('❗ Error fetching AI data:', error);
-    }
-  }, []);
-
-  const fetchUserDetails = useCallback(async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      const decoded = jwt.decode(token);
-      const email = decoded?.user?.email;
-      if (!email) return;
-
-      const usersRes = await fetch('https://wellio-backend.onrender.com/allusers');
-      const usersData = await usersRes.json();
-      const foundUser = usersData.find(u => u.email === email);
-      setUser(foundUser || null);
-
-      // Only fetch vitals if it's been more than 10 minutes since last fetch
-      if (Date.now() - lastFetchTime > 600000 || lastFetchTime === 0) {
-        fetchVitalsData(email);
-      }
-    } catch (error) {
-      console.error('❗ Error fetching user:', error);
-    }
-  }, [fetchVitalsData, lastFetchTime]);
-
-  // Initial fetch on mount
   useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const decoded = jwt.decode(token);
+        const email = decoded?.user?.email;
+        if (!email) return;
+
+        const usersRes = await fetch('https://wellio-backend.onrender.com/allusers');
+        const usersData = await usersRes.json();
+        const foundUser = usersData.find(u => u.email === email);
+        setUser(foundUser || null);
+
+        const interval = setInterval(async () => {
+          const vitalsRes = await fetch('https://wellio-backend.onrender.com/api/vitals');
+          const vitalsData = await vitalsRes.json();
+          const foundVitals = vitalsData.find(v => v.email === email);
+          setVitals(foundVitals || null);
+        }, 3000);
+
+        return () => clearInterval(interval);
+      } catch (error) {
+        console.error('❗ Error fetching user or vitals:', error);
+      }
+    };
+
     fetchUserDetails();
-  }, [fetchUserDetails]);
+  }, []);
 
-  // Set up interval for periodic refresh (every 10 minutes)
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchUserDetails();
-    }, 600000); // 10 minutes
+    if (!vitals || !user) return;
 
-    return () => clearInterval(interval);
-  }, [fetchUserDetails]);
+    const fetchAI = async () => {
+      try {
+        const vitalsHistory = vitals.history?.slice(-10) || [];
+        const staticData = {
+          allergies: vitals.allergies,
+          medications: vitals.medications,
+          medicalHistory: vitals.medicalHistory,
+          familyHistory: vitals.familyHistory,
+          lifestyle: vitals.lifestyle,
+          sleep: vitals.sleep,
+          diet: vitals.diet,
+          exercise: vitals.exercise,
+          stressLevel: vitals.stressLevel,
+          hydration: vitals.hydration,
+          smoking: vitals.smoking,
+          alcohol: vitals.alcohol,
+          caffeine: vitals.caffeine,
+          screenTime: vitals.screenTime,
+        };
 
-  // Rendering helper for vitals card
+        const res = await fetch('https://wellio-backend.onrender.com/api/get-health-ai', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ vitalsHistory, staticData }),
+        });
+
+        const data = await res.json();
+        setAiTip(data.tip);
+        setAiSummary(data.summary);
+      } catch (err) {
+        console.error('🧠 AI fetch error:', err);
+      }
+    };
+
+    fetchAI();
+  }, [ user]);
+
   const renderVitalCard = (label, value, unit = "") => (
     <div className="vital-card">
       <p className="vital-label">{label}</p>
@@ -113,22 +90,23 @@ export default function Dashboard() {
     </div>
   );
 
-  if (!user) return <p>Loading user...</p>;
-  if (!vitals) return <p>Loading vitals...</p>;
-   return (
+  if (!user || !vitals) return <p>Loading data...</p>;
+
+  return (
     <div className="dashboard">
+      {/* Left Side */}
       <div className="left-side">
         <h1 className="dashboard-heading">Patient Dashboard</h1>
-        
+
         {/* User Info */}
         <div className="user-info">
           <p><strong>Name:</strong> {user.name}</p>
           <p><strong>Email:</strong> {user.email}</p>
         </div>
-
-        <div className='Ai-tip'><strong>AI Tip:</strong> {aiTip || 'Loading tip...'}</div>
-
+<div className='Ai-tip'><strong>AI Tip:</strong> {aiTip || 'Loading tip...'}</div>
+        {/* Card Grid */}
         <div className="card-grid">
+          {/* Basic Info */}
           <div className="vital-group basic-info">
             <h2>Basic Information</h2>
             <div className="vital-card-container">
@@ -140,6 +118,7 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Health History */}
           <div className="vital-group health-history">
             <h2>Health History</h2>
             <div className="vital-card-container">
@@ -150,6 +129,7 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Lifestyle */}
           <div className="vital-group lifestyle-info">
             <h2>Lifestyle</h2>
             <div className="vital-card-container">
@@ -166,6 +146,7 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Live Vitals */}
           <div className="vital-group live-vitals">
             <h2>Live Vitals</h2>
             <div className="vital-card-container">
@@ -185,6 +166,7 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Right Side */}
       <div className="right-side">
         <div className="doctor-info">
           <h3>Your Doctor</h3>

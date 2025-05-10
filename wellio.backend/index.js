@@ -887,38 +887,47 @@ const users = [
 
 
 // Generate random vitals
-function getRandomVital({ min, max, abnormalMin, abnormalMax }) {
-  const isAbnormal = Math.random() < 0.3; // 30% chance abnormal
-  if (!isAbnormal) return +(Math.random() * (max - min) + min).toFixed(1);
-  return Math.random() < 0.5
-    ? +(Math.random() * (abnormalMin.max - abnormalMin.min) + abnormalMin.min).toFixed(1)
-    : +(Math.random() * (abnormalMax.max - abnormalMax.min) + abnormalMax.min).toFixed(1);
+let cachedVitals = [];
+let lastUpdateTime = 0;
+const UPDATE_INTERVAL = 90 * 1000; // 1.5 minutes
+
+function getStableVitals(user) {
+  return {
+    ...user,
+    vitals: {
+      bloodPressure: `${getRandomInRange(110, 120)}/${getRandomInRange(70, 80)}`,
+      oxygenLevel: getRandomInRange(96, 100),
+      heartbeat: getRandomInRange(60, 100),
+      temperature: getRandomInRange(97, 99),
+      breathingRate: getRandomInRange(12, 18),
+      heartRateVariability: getRandomInRange(40, 80),
+      vo2Max: getRandomInRange(35, 45),
+      sleepDuration: getRandomInRange(7, 8.5), // average per day
+      steps: user.vitals?.steps ? user.vitals.steps + getRandomInRange(10, 50) : getRandomInRange(1000, 3000),
+      caloriesBurned: user.vitals?.caloriesBurned ? user.vitals.caloriesBurned + getRandomInRange(20, 50) : getRandomInRange(500, 800),
+      noiseLevel: getRandomInRange(30, 70)
+    }
+  };
+}
+
+function getRandomInRange(min, max) {
+  return +(Math.random() * (max - min) + min).toFixed(1);
 }
 
 function getUserVitals() {
-  return users.map(user => {
-    return {
-      ...user,
-      vitals: {
-        bloodPressure: `${Math.floor(getRandomVital({ min: 90, max: 120, abnormalMin: { min: 70, max: 89 }, abnormalMax: { min: 121, max: 160 } }))}/${Math.floor(getRandomVital({ min: 60, max: 80, abnormalMin: { min: 40, max: 59 }, abnormalMax: { min: 81, max: 100 } }))}`,
-        oxygenLevel: getRandomVital({ min: 95, max: 100, abnormalMin: { min: 80, max: 89 }, abnormalMax: { min: 101, max: 105 } }),
-        heartbeat: getRandomVital({ min: 60, max: 100, abnormalMin: { min: 30, max: 59 }, abnormalMax: { min: 101, max: 150 } }),
-        temperature: getRandomVital({ min: 97, max: 99, abnormalMin: { min: 95, max: 96.9 }, abnormalMax: { min: 99.1, max: 103 } }),
-        breathingRate: getRandomVital({ min: 12, max: 20, abnormalMin: { min: 6, max: 11 }, abnormalMax: { min: 21, max: 30 } }),
-        heartRateVariability: getRandomVital({ min: 20, max: 100, abnormalMin: { min: 5, max: 19 }, abnormalMax: { min: 101, max: 150 } }), // ms
-        vo2Max: getRandomVital({ min: 35, max: 50, abnormalMin: { min: 20, max: 34 }, abnormalMax: { min: 51, max: 70 } }), // ml/kg/min
-        sleepDuration: getRandomVital({ min: 6, max: 9, abnormalMin: { min: 3, max: 5.9 }, abnormalMax: { min: 9.1, max: 12 } }), // in hours
-        steps: Math.floor(getRandomVital({ min: 5000, max: 12000, abnormalMin: { min: 0, max: 4999 }, abnormalMax: { min: 12001, max: 20000 } })), // steps
-        caloriesBurned: Math.floor(getRandomVital({ min: 1500, max: 2500, abnormalMin: { min: 800, max: 1499 }, abnormalMax: { min: 2501, max: 3500 } })), // kcal
-        noiseLevel: getRandomVital({ min: 30, max: 80, abnormalMin: { min: 10, max: 29 }, abnormalMax: { min: 81, max: 100 } }) // dB
-      }
-    };
-  });
-};
-
+  const now = Date.now();
+  if (!cachedVitals.length || now - lastUpdateTime > UPDATE_INTERVAL) {
+    cachedVitals = users.map(user => {
+      const oldUser = cachedVitals.find(u => u.id === user.id) || {};
+      return getStableVitals(oldUser);
+    });
+    lastUpdateTime = now;
+  }
+  return cachedVitals;
+}
 
 app.get('/api/vitals', (req, res) => {
-    res.json(getUserVitals());
+  res.json(getUserVitals());
 });
 
 // Initialize OpenAI with the API key
