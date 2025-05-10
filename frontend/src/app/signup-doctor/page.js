@@ -100,7 +100,7 @@ export default function Signup() {
       </div>
       <div className='signup-container'>
         {step === 'signup' ? (
-          <div>
+          <div className="signupheads-head">
             <div className='signupheads'>
               <div className='head1'>CREATE AN ACCOUNT</div>
               <div className='head2'>Join as a Doctor</div>
@@ -126,13 +126,13 @@ export default function Signup() {
                 <label>Phone</label>
                 <input type="text" name="phone" value={formData.phone} onChange={handleChange} required />
               </div>
-              <div className='input-order'>
+              <div className='input-order input-order-about'>
                 <label>About (Optional)</label>
                 <textarea name="about" value={formData.about} onChange={handleChange} />
               </div>
               <button type="submit" className="submit-btn">Get Started</button>
             </form>
-            <div className='orusecont'><div className='oruse'> Or Use </div></div>
+            {/* <div className='orusecont'><div className='oruse'> Or Use </div></div> */}
           </div>
         ) : (
           <div>
