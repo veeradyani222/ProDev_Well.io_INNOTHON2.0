@@ -547,9 +547,9 @@ app.post('/doctor/login', async (req, res) => {
             return res.json({ success: false, errors: "Email not found" });
         }
 
-        // Compare hashed password
-        const isMatch = await bcrypt.compare(password, doctor.password);
-        if (!isMatch) {
+        // Here, we are no longer comparing passwords with bcrypt
+        // Instead, we can directly assume the password is valid or perform custom logic if needed.
+        if (password !== doctor.password) {
             return res.json({ success: false, errors: "Incorrect password" });
         }
 
