@@ -11,7 +11,7 @@ const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 const cloudinary = require('cloudinary').v2;
 require('dotenv').config();
-const { OpenAI } = require("openai");
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 
 
@@ -129,22 +129,34 @@ app.post('/signup', async (req, res) => {
             return res.status(400).json({ success: false, errors: "Email is already registered." });
         }
 
+        // Check if doctor exists
+        const doctorUser = await Doctors.findOne({ email: doctor });
+        if (!doctorUser) {
+            return res.status(404).json({ success: false, errors: "Doctor not found." });
+        }
+
         // Generate verification code
         const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // Store temporarily for verification
+        // Temporarily store user info
         pendingVerifications[email] = {
             name,
             email,
             password,
             status,
-            doctor, // string
+            doctor,
             address,
             verificationCode,
             createdAt: Date.now()
         };
 
-        // Send email
+        // Add patient to doctor's patients array if not already present
+        if (!doctorUser.patients.includes(email)) {
+            doctorUser.patients.push(email);
+            await doctorUser.save();
+        }
+
+        // Send verification email
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -158,19 +170,19 @@ app.post('/signup', async (req, res) => {
             to: email,
             subject: 'Welcome to Wellio – Verify Your Email',
             html: `
-            <html>
-                <body style="background-color: #1d3c34; color: white; font-family: Arial, sans-serif; padding: 20px;">
-                    <h1 style="color: #4CAF50;">Welcome to Wellio, ${name}!</h1>
-                    <p style="font-size: 18px;">Thank you for signing up.</p>
-                    <p style="font-size: 18px;">Your verification code is:</p>
-                    <h2 style="font-size: 32px; color: #ffffff; background-color: #4CAF50; display: inline-block; padding: 10px 20px; border-radius: 8px;">
-                        ${verificationCode}
-                    </h2>
-                    <p style="font-size: 14px; margin-top: 20px;">Enter this code in the app to complete your registration.</p>
-                    <p style="font-size: 14px;">If you didn’t request this, you can safely ignore this email.</p>
-                </body>
-            </html>
-        `
+      <html>
+        <body style="background-color: #1d3c34; color: white; font-family: Arial, sans-serif; padding: 20px;">
+          <h1 style="color: #4CAF50;">Welcome to Wellio, ${name}!</h1>
+          <p style="font-size: 18px;">Thank you for signing up.</p>
+          <p style="font-size: 18px;">Your verification code is:</p>
+          <h2 style="font-size: 32px; color: #ffffff; background-color: #4CAF50; display: inline-block; padding: 10px 20px; border-radius: 8px;">
+            ${verificationCode}
+          </h2>
+          <p style="font-size: 14px; margin-top: 20px;">Enter this code in the app to complete your registration.</p>
+          <p style="font-size: 14px;">If you didn’t request this, you can safely ignore this email.</p>
+        </body>
+      </html>
+      `
         });
 
         res.json({ success: true, message: "Please verify your email address." });
@@ -180,6 +192,7 @@ app.post('/signup', async (req, res) => {
         res.status(500).json({ error: "Signup failed." });
     }
 });
+
 
 app.post('/verify-email', async (req, res) => {
     try {
@@ -887,12 +900,31 @@ const users = [
 
 
 // Generate random vitals
-function getRandomVital({ min, max, abnormalMin, abnormalMax }) {
-    const isAbnormal = Math.random() < 0.3; // 30% chance abnormal
-    if (!isAbnormal) return +(Math.random() * (max - min) + min).toFixed(1);
-    return Math.random() < 0.5
-        ? +(Math.random() * (abnormalMin.max - abnormalMin.min) + abnormalMin.min).toFixed(1)
-        : +(Math.random() * (abnormalMax.max - abnormalMax.min) + abnormalMax.min).toFixed(1);
+let cachedVitals = [];
+let lastUpdateTime = 0;
+const UPDATE_INTERVAL = 90 * 1000; // 1.5 minutes
+
+function getStableVitals(user) {
+    return {
+        ...user,
+        vitals: {
+            bloodPressure: `${getRandomInRange(110, 120)}/${getRandomInRange(70, 80)}`,
+            oxygenLevel: getRandomInRange(96, 100),
+            heartbeat: getRandomInRange(60, 100),
+            temperature: getRandomInRange(97, 99),
+            breathingRate: getRandomInRange(12, 18),
+            heartRateVariability: getRandomInRange(40, 80),
+            vo2Max: getRandomInRange(35, 45),
+            sleepDuration: getRandomInRange(7, 8.5), // average per day
+            steps: user.vitals?.steps ? user.vitals.steps + getRandomInRange(10, 50) : getRandomInRange(1000, 3000),
+            caloriesBurned: user.vitals?.caloriesBurned ? user.vitals.caloriesBurned + getRandomInRange(20, 50) : getRandomInRange(500, 800),
+            noiseLevel: getRandomInRange(30, 70)
+        }
+    };
+}
+
+function getRandomInRange(min, max) {
+    return +(Math.random() * (max - min) + min).toFixed(1);
 }
 
 function getUserVitals() {
@@ -921,51 +953,203 @@ app.get('/api/vitals', (req, res) => {
     res.json(getUserVitals());
 });
 
-// Initialize OpenAI with the API key
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-app.post('/api/get-health-ai', async (req, res) => {
-    const { vitalsHistory, staticData } = req.body;
+const userLastRequest = new Map();
 
-    if (!vitalsHistory || !staticData) {
-        return res.status(400).json({ error: 'Missing vitals or static data' });
+app.post('/api/test-ai', async (req, res) => {
+    const { vitals, staticData } = req.body;
+
+    if (!vitals || !staticData) {
+        return res.status(400).json({ error: 'Missing required data' });
     }
 
-    const tipPrompt = `
-You are a health assistant. Based on this 10-minute rolling vitals data:\n
-${JSON.stringify(vitalsHistory, null, 2)}\n
-Give a short, friendly, personalized one-sentence health tip.
+    try {
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+        const prompt = `
+You're a virtual health assistant. Based on the following patient information, provide:
+
+1. A brief health **overview**.
+2. Identify any **abnormalities** or areas of concern.
+3. Suggest **one practical tip** (e.g., if BP is low, "Consider a salty snack"). The tip should not be more than two lines.The overview should be brief and in a way that younare speakinmg to the person, not talking about them.
+
+### Patient Info:
+- Age: ${staticData.age}
+- Gender: ${staticData.gender}
+- Height: ${staticData.height} cm
+- Weight: ${staticData.weight} kg
+- BMI: ${(staticData.weight / ((staticData.height / 100) ** 2)).toFixed(2)}
+- Allergies: ${staticData.allergies}
+- Medications: ${staticData.medications}
+- Medical History: ${staticData.medicalHistory}
+- Family History: ${staticData.familyHistory}
+- Lifestyle: ${staticData.lifestyle}
+- Sleep: ${staticData.sleep}
+- Diet: ${staticData.diet}
+- Exercise: ${staticData.exercise}
+- Stress Level: ${staticData.stressLevel}
+- Hydration: ${staticData.hydration}
+- Smoking: ${staticData.smoking}
+- Alcohol: ${staticData.alcohol}
+- Caffeine: ${staticData.caffeine}
+- Screen Time: ${staticData.screenTime}
+
+### Latest Vitals:
+${Object.entries(vitals).map(([key, value]) => `- ${key}: ${value}`).join("\n")}
+
+Respond in this format:
+Overview: ...
+Abnormalities: ...
+Tip: ...
 `;
 
-    const summaryPrompt = `
-You are a smart health analyst. Based on the vitals:\n
-${JSON.stringify(vitalsHistory, null, 2)}\n
-and static patient data (like allergies, diet, exercise, lifestyle):\n
-${JSON.stringify(staticData, null, 2)}\n
-Give a short summary of their health in two sentences and suggest one improvement.
-`;
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+
+        const [overview, abnormalities, tip] = text.split(/Overview:|Abnormalities:|Tip:/)
+            .map(s => s?.trim())
+            .filter(Boolean);
+
+        return res.json({
+            overview,
+            abnormalities,
+            tip
+        });
+    } catch (error) {
+        console.error('Gemini API error:', error.message);
+        return res.status(500).json({
+            error: 'AI service unavailable',
+            details: error.message
+        });
+    }
+});
+
+
+app.post('/api/doctor-insights', async (req, res) => {
+    const { vitals, staticData } = req.body;
+
+    if (!vitals || !staticData) {
+        return res.status(400).json({ error: 'Missing required patient data' });
+    }
 
     try {
-        const [tipResponse, summaryResponse] = await Promise.all([
-            openai.chat.completions.create({
-                model: 'gpt-3.5-turbo',
-                messages: [{ role: 'user', content: tipPrompt }],
-            }),
-            openai.chat.completions.create({
-                model: 'gpt-3.5-turbo',
-                messages: [{ role: 'user', content: summaryPrompt }],
-            }),
-        ]);
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-        const tip = tipResponse.choices[0].message.content.trim();
-        const summary = summaryResponse.choices[0].message.content.trim();
+        const prompt = ` 
+You are a medical AI assistant providing detailed insights to a doctor about their patient. 
+Analyze the following patient data and provide a structured response with key findings (please do not use any bold letters or bullet points, keep the text very plain).:
 
-        return res.json({ tip, summary });
+### Patient Background:
+- Name: ${staticData.name || 'Not provided'}
+- Age: ${staticData.age}
+- Gender: ${staticData.gender}
+- BMI: ${(staticData.weight) / ((staticData.height / 100) ** 2).toFixed(1)} (${staticData.height}cm, ${staticData.weight}kg)
+- Blood Group: ${staticData.bloodGroup}
+
+### Medical Context:
+- Allergies: ${staticData.allergies || 'None reported'}
+- Current Medications: ${staticData.medications || 'None'}
+- Medical History: ${staticData.medicalHistory || 'None significant'}
+- Family History: ${staticData.familyHistory || 'None significant'}
+
+### Lifestyle Factors:
+- Activity Level: ${staticData.lifestyle}
+- Exercise: ${staticData.exercise}
+- Sleep: ${staticData.sleep}
+- Diet: ${staticData.diet}
+- Stress: ${staticData.stressLevel}
+- Habits: ${staticData.smoking}, ${staticData.alcohol}, ${staticData.caffeine}
+
+### Current Vitals:
+${Object.entries(vitals).map(([key, value]) => `- ${key}: ${value}`).join("\n")}
+
+Provide your analysis in this exact format (keep each section concise but comprehensive):
+
+**1. Key Health Summary**
+[2-3 sentence overview of patient's overall health status]
+
+**2. Notable Abnormalities**
+- [Bullet point 1 - specific abnormal value with context]
+- [Bullet point 2 - if another exists]
+- [Flag any values outside normal ranges]
+
+**3. Risk Factors**
+- [Primary lifestyle risk factor 1]
+- [Secondary risk factor 2]
+- [Any concerning combinations]
+
+**4. Recommended Actions**
+1. [Primary clinical recommendation]
+2. [Secondary suggestion]
+3. [Lifestyle modification if needed]
+
+**5. Follow-up Considerations**
+- [Specific metrics to monitor]
+- [Suggested timeframe for re-evaluation]
+- [Any red flags to watch for]
+`;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+
+        // More robust parsing function
+        const parseInsights = (text) => {
+            const sections = {
+                summary: '',
+                abnormalities: '',
+                risks: '',
+                actions: '',
+                followup: ''
+            };
+
+            // Split by numbered sections first
+            const sectionPattern = /\n\n\d\./g;
+            const parts = text.split(sectionPattern);
+
+            // If we got the expected 5 parts (0-4)
+            if (parts.length >= 5) {
+                return {
+                    summary: parts[0].replace('1. Key Health Summary', '').trim(),
+                    abnormalities: parts[1].replace('2. Notable Abnormalities', '').trim(),
+                    risks: parts[2].replace('3. Risk Factors', '').trim(),
+                    actions: parts[3].replace('4. Recommended Actions', '').trim(),
+                    followup: parts[4].replace('5. Follow-up Considerations', '').trim()
+                };
+            }
+
+            // Fallback: Try to find each section independently
+            const findSection = (title) => {
+                const regex = new RegExp(`${title}[\\s\\S]*?(?=\\n\\n\\d\\.|$)`, 'i');
+                const match = text.match(regex);
+                return match ? match[0].replace(title, '').trim() : '';
+            };
+
+            return {
+                summary: findSection('1. Key Health Summary') || 'No summary available',
+                abnormalities: findSection('2. Notable Abnormalities') || 'No abnormalities detected',
+                risks: findSection('3. Risk Factors') || 'No significant risk factors',
+                actions: findSection('4. Recommended Actions') || 'No specific recommendations',
+                followup: findSection('5. Follow-up Considerations') || 'Standard monitoring recommended'
+            };
+        };
+
+        const insights = parseInsights(text);
+
+        return res.json({
+            success: true,
+            insights,
+            lastUpdated: new Date().toISOString()
+        });
+
     } catch (error) {
-        console.error('OpenAI API error:', error.message);
-        return res.status(500).json({ error: 'Failed to generate AI response' });
+        console.error('Doctor insights error:', error);
+        return res.status(500).json({
+            error: 'Failed to generate medical insights',
+            details: error.message
+        });
     }
 });
 

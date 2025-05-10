@@ -24,6 +24,25 @@ export default function Dashboard() {
   const [aiSummary, setAiSummary] = useState('');
   const [doctor, setDoctor] = useState(null);
 
+  // Update snapshot every 10 minutes
+  useEffect(() => {
+    const updateSnapshot = () => {
+      if (vitals) {
+        setVitalsSnapshot({
+          ...vitals.vitals,
+          age: vitals.age,
+          gender: vitals.gender,
+        });
+      }
+    };
+
+    updateSnapshot(); // initial call
+    const interval = setInterval(updateSnapshot, 10 * 60 * 1000); // every 10 minutes
+
+    return () => clearInterval(interval);
+  }, [vitals]);
+
+  // Fetch user and vitals data on mount
   useEffect(() => {
     const fetchUserVitalsAndDoctor = async () => {
       try {
@@ -67,13 +86,18 @@ export default function Dashboard() {
     fetchUserVitalsAndDoctor();
   }, []);
 
+  // Fetch AI data when snapshot changes (every 10 minutes)
   useEffect(() => {
-    if (!vitals || !user) return;
+    if (!vitalsSnapshot || !user) return;
 
-    const fetchAIInsights = async () => {
+    const fetchAI = async () => {
       try {
-        const vitalsHistory = vitals.history?.slice(-10) || [];
         const staticData = {
+          age: vitals.age,
+          gender: vitals.gender,
+          height: vitals.height,
+          weight: vitals.weight,
+          bloodGroup: vitals.bloodGroup,
           allergies: vitals.allergies,
           medications: vitals.medications,
           medicalHistory: vitals.medicalHistory,
@@ -90,22 +114,26 @@ export default function Dashboard() {
           screenTime: vitals.screenTime,
         };
 
-        const res = await fetch('https://wellio-backend.onrender.com/api/get-health-ai', {
+        const res = await fetch('http://localhost:4000/api/test-ai', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ vitalsHistory, staticData }),
+          body: JSON.stringify({
+            vitals: vitalsSnapshot,
+            staticData,
+          }),
         });
 
         const data = await res.json();
-        setAiTip(data.tip);
-        setAiSummary(data.summary);
+        setAiSummary(data.overview || '');
+        setAiTip(data.tip || '');
       } catch (err) {
-        console.error('AI fetch error:', err);
+        console.error('🧠 AI fetch error:', err);
       }
     };
 
-    fetchAIInsights();
-  }, [vitals, user]);
+    fetchAI();
+  }, [vitalsSnapshot, user]);
+
 
   if (!user || !vitals) {
     return (
