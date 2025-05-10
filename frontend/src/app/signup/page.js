@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import './SignUp.css';
 import Arrow from './../assets/arrow-right.png';
@@ -20,6 +21,22 @@ export default function Signup() {
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const router = useRouter();
+
+  const [doctors, setDoctors] = useState([]);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const res = await fetch('https://wellio-backend.onrender.com/alldoctors');
+        const data = await res.json();
+        setDoctors(data); // expects array of doctors with name and email
+      } catch (err) {
+        console.error("Failed to fetch doctors:", err);
+      }
+    };
+    fetchDoctors();
+  }, []);
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -115,9 +132,16 @@ export default function Signup() {
               <div className='input-order'><label>Password</label>
                 <input type="password" name="password" value={formData.password} onChange={handleChange} required />
               </div>
-              <div className='input-order'><label>Doctor</label>
-                <input type="text" name="doctor" value={formData.doctor} onChange={handleChange} required />
+              <div className='input-order'>
+                <label>Select Your Doctor</label>
+                <select name="doctor" value={formData.doctor} onChange={handleChange} required>
+                  <option value="">-- Choose a Doctor --</option>
+                  {doctors.map((doc) => (
+                    <option key={doc.email} value={doc.email}>{doc.name}</option>
+                  ))}
+                </select>
               </div>
+
               <div className='input-order'><label>Address</label>
                 <input type="text" name="address" value={formData.address} onChange={handleChange} required />
               </div>

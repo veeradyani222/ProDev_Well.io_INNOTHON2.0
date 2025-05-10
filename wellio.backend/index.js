@@ -204,6 +204,18 @@ app.post('/verify-email', async (req, res) => {
         });
 
         await user.save();
+
+        // ✅ Add this user to the doctor's patients list
+        const doctor = await Doctors.findOne({ name: pendingUser.doctor });
+        if (doctor) {
+            if (!doctor.patients.includes(email)) {
+                doctor.patients.push(email);
+                await doctor.save();
+            }
+        } else {
+            console.warn(`Doctor with name "${pendingUser.doctor}" not found.`);
+        }
+
         delete pendingVerifications[email]; // Cleanup
 
         res.json({ success: true, message: "Email verified successfully." });
@@ -212,7 +224,6 @@ app.post('/verify-email', async (req, res) => {
         res.status(500).json({ error: "Verification failed." });
     }
 });
-
 
 // Login route
 app.post('/login', async (req, res) => {
@@ -547,9 +558,9 @@ app.post('/doctor/login', async (req, res) => {
             return res.json({ success: false, errors: "Email not found" });
         }
 
-        // Compare hashed password
-        const isMatch = await bcrypt.compare(password, doctor.password);
-        if (!isMatch) {
+        // Here, we are no longer comparing passwords with bcrypt
+        // Instead, we can directly assume the password is valid or perform custom logic if needed.
+        if (password !== doctor.password) {
             return res.json({ success: false, errors: "Incorrect password" });
         }
 
@@ -739,6 +750,18 @@ app.post("/doctor/reset-password", async (req, res) => {
     } catch (error) {
         console.error("Doctor Reset Password Error:", error);
         res.status(400).json({ message: "Invalid or expired token" });
+    }
+});
+
+
+
+app.get('/alldoctors', async (req, res) => {
+    try {
+        let doctors = await Doctors.find({}).sort({ date: -1 });
+        res.json(doctors);
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        res.status(500).json({ error: "Failed to fetch users" });
     }
 });
 

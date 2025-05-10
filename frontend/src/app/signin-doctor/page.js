@@ -29,7 +29,7 @@ export default function DoctorSignIn() {
       const data = await response.json();
       if (data.success) {
         localStorage.setItem('token', data.token);
-        router.push('/doctor-dashboard'); // Redirect to doctor dashboard
+        router.push('/DoctorDashboard'); // Redirect to doctor dashboard
       } else {
         setError(data.errors || 'Login failed.');
       }
