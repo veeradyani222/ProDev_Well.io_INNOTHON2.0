@@ -11,7 +11,7 @@ const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 const cloudinary = require('cloudinary').v2;
 require('dotenv').config();
-const { Configuration, OpenAIApi } = require('openai');
+const { OpenAI } = require("openai");
 
 
 
@@ -921,11 +921,10 @@ app.get('/api/vitals', (req, res) => {
     res.json(getUserVitals());
 });
 
-
-const configuration = new Configuration({
+// Initialize OpenAI with the API key
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
 app.post('/api/get-health-ai', async (req, res) => {
   const { vitalsHistory, staticData } = req.body;
@@ -950,18 +949,18 @@ Give a short summary of their health in two sentences and suggest one improvemen
 
   try {
     const [tipResponse, summaryResponse] = await Promise.all([
-      openai.createChatCompletion({
+      openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: tipPrompt }],
       }),
-      openai.createChatCompletion({
+      openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: summaryPrompt }],
       }),
     ]);
 
-    const tip = tipResponse.data.choices[0].message.content.trim();
-    const summary = summaryResponse.data.choices[0].message.content.trim();
+    const tip = tipResponse.choices[0].message.content.trim();
+    const summary = summaryResponse.choices[0].message.content.trim();
 
     return res.json({ tip, summary });
   } catch (error) {
