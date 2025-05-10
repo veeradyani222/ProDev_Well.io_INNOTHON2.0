@@ -29,7 +29,7 @@ export default function SignIn() {
       const data = await response.json();
       if (data.success) {
         localStorage.setItem('token', data.token); // Store token if needed
-        router.push('/'); // Redirect to homepage after successful login
+    window.location.href = '/';
       } else {
         setError(data.errors || 'Login failed.');
       }
