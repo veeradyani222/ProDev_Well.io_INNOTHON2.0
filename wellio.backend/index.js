@@ -950,11 +950,11 @@ Give a short summary of their health in two sentences and suggest one improvemen
   try {
     const [tipResponse, summaryResponse] = await Promise.all([
       openai.chat.completions.create({
-        model: 'gpt-4',
+        model: 'gpt-3.5-turbo',
         messages: [{ role: 'user', content: tipPrompt }],
       }),
       openai.chat.completions.create({
-        model: 'gpt-4',
+        model: 'gpt-3.5-turbo',
         messages: [{ role: 'user', content: summaryPrompt }],
       }),
     ]);
