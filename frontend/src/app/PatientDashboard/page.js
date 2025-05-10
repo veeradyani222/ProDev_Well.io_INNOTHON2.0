@@ -8,7 +8,27 @@ export default function Dashboard() {
   const [vitals, setVitals] = useState(null);
   const [aiTip, setAiTip] = useState('');
   const [aiSummary, setAiSummary] = useState('');
+  const [vitalsSnapshot, setVitalsSnapshot] = useState(null);
 
+  // Update snapshot every 10 minutes
+  useEffect(() => {
+    const updateSnapshot = () => {
+      if (vitals) {
+        setVitalsSnapshot({
+          ...vitals.vitals,
+          age: vitals.age,
+          gender: vitals.gender,
+        });
+      }
+    };
+
+    updateSnapshot(); // initial call
+    const interval = setInterval(updateSnapshot, 10 * 60 * 1000); // every 10 minutes
+
+    return () => clearInterval(interval);
+  }, [vitals]);
+
+  // Fetch user and vitals data on mount
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -19,19 +39,18 @@ export default function Dashboard() {
         const email = decoded?.user?.email;
         if (!email) return;
 
+        // Fetch user data
         const usersRes = await fetch('https://wellio-backend.onrender.com/allusers');
         const usersData = await usersRes.json();
         const foundUser = usersData.find(u => u.email === email);
         setUser(foundUser || null);
 
-        const interval = setInterval(async () => {
-          const vitalsRes = await fetch('http://localhost:4000/api/vitals');
-          const vitalsData = await vitalsRes.json();
-          const foundVitals = vitalsData.find(v => v.email === email);
-          setVitals(foundVitals || null);
-        }, 3000);
+        // Fetch vitals data
+        const vitalsRes = await fetch('http://localhost:4000/api/vitals');
+        const vitalsData = await vitalsRes.json();
+        const foundVitals = vitalsData.find(v => v.email === email);
+        setVitals(foundVitals || null);
 
-        return () => clearInterval(interval);
       } catch (error) {
         console.error('❗ Error fetching user or vitals:', error);
       }
@@ -40,45 +59,54 @@ export default function Dashboard() {
     fetchUserDetails();
   }, []);
 
-  useEffect(() => {
-    if (!vitals || !user) return;
+  // Fetch AI data when snapshot changes (every 10 minutes)
+ useEffect(() => {
+  if (!vitalsSnapshot || !user) return;
 
-    const fetchAI = async () => {
-      try {
-        const vitalsHistory = vitals.history?.slice(-10) || [];
-        const staticData = {
-          allergies: vitals.allergies,
-          medications: vitals.medications,
-          medicalHistory: vitals.medicalHistory,
-          familyHistory: vitals.familyHistory,
-          lifestyle: vitals.lifestyle,
-          sleep: vitals.sleep,
-          diet: vitals.diet,
-          exercise: vitals.exercise,
-          stressLevel: vitals.stressLevel,
-          hydration: vitals.hydration,
-          smoking: vitals.smoking,
-          alcohol: vitals.alcohol,
-          caffeine: vitals.caffeine,
-          screenTime: vitals.screenTime,
-        };
+  const fetchAI = async () => {
+    try {
+      const staticData = {
+        age: vitals.age,
+        gender: vitals.gender,
+        height: vitals.height,
+        weight: vitals.weight,
+        bloodGroup: vitals.bloodGroup,
+        allergies: vitals.allergies,
+        medications: vitals.medications,
+        medicalHistory: vitals.medicalHistory,
+        familyHistory: vitals.familyHistory,
+        lifestyle: vitals.lifestyle,
+        sleep: vitals.sleep,
+        diet: vitals.diet,
+        exercise: vitals.exercise,
+        stressLevel: vitals.stressLevel,
+        hydration: vitals.hydration,
+        smoking: vitals.smoking,
+        alcohol: vitals.alcohol,
+        caffeine: vitals.caffeine,
+        screenTime: vitals.screenTime,
+      };
 
-        const res = await fetch('https://wellio-backend.onrender.com/api/get-health-ai', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ vitalsHistory, staticData }),
-        });
+      const res = await fetch('http://localhost:4000/api/test-ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vitals: vitalsSnapshot, 
+          staticData, 
+        }),
+      });
 
-        const data = await res.json();
-        setAiTip(data.tip);
-        setAiSummary(data.summary);
-      } catch (err) {
-        console.error('🧠 AI fetch error:', err);
-      }
-    };
+      const data = await res.json();
+      setAiSummary(data.overview || '');
+      setAiTip(data.tip || '');
+    } catch (err) {
+      console.error('🧠 AI fetch error:', err);
+    }
+  };
 
-    fetchAI();
-  }, [ user]);
+  fetchAI();
+}, [vitalsSnapshot, user]);
+
 
   const renderVitalCard = (label, value, unit = "") => (
     <div className="vital-card">
@@ -103,7 +131,11 @@ export default function Dashboard() {
           <p><strong>Name:</strong> {user.name}</p>
           <p><strong>Email:</strong> {user.email}</p>
         </div>
-<div className='Ai-tip'><strong>AI Tip:</strong> {aiTip || 'Loading tip...'}</div>
+
+        <div className='Ai-tip'>
+          <strong>AI Tip:</strong> {aiTip || 'Loading tip...'}
+        </div>
+
         {/* Card Grid */}
         <div className="card-grid">
           {/* Basic Info */}
