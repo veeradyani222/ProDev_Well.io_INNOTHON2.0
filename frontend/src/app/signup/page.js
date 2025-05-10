@@ -102,7 +102,7 @@ export default function Signup() {
       </div>
       <div className='signup-container'>
         {step === 'signup' ? (
-          <>
+          <div className='signupheads-head'>
             <div className='signupheads'>
               <div className='head1'>CREATE AN ACCOUNT</div>
               <div className='head2'>Join as a Patient</div>
@@ -131,7 +131,7 @@ export default function Signup() {
               </div>
               <button type="submit" className="submit-btn">Get Started</button>
             </form>
-          </>
+          </div>
         ) : (
           <>
             <div className="signupheads"><div className='head1'>VERIFY YOUR EMAIL</div></div>
