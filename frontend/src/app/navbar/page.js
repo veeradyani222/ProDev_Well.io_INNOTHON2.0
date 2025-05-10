@@ -8,6 +8,7 @@ import Logo from './../assets/wellio-logo.svg';
 import Menu from './../assets/Menubtn.svg';
 import Remove from './../assets/remove.svg';
 import { usePathname } from 'next/navigation';
+import jwt_decode from 'jwt-decode';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -19,21 +20,29 @@ const Navbar = () => {
 
   useEffect(() => {
     const fetchUserName = async () => {
-      const userEmail = localStorage.getItem('userEmail'); // Get email from storage
-      if (!userEmail) return;
+      const token = localStorage.getItem('token');
+      if (!token) return;
 
       try {
+        const decoded = jwt_decode(token);
+        const userInfo = decoded?.user || decoded?.doctor;
+        const email = userInfo?.email;
+        const appUser = userInfo?.appUser;
+
+        if (!email || !appUser) return;
+
+        localStorage.setItem("userEmail", email);
+
         const response = await fetch('https://doord.onrender.com/allusers');
         const users = await response.json();
 
-        // Find user by email
-        const user = users.find(u => u.email === userEmail);
-        if (user) {
-          setUserName(user.name); // Store name in state
-          localStorage.setItem('userName', user.name); // Save name for persistence
+        const foundUser = users.find(u => u.email === email);
+        if (foundUser) {
+          setUserName(foundUser.name);
+          localStorage.setItem("userName", foundUser.name);
         }
       } catch (err) {
-        console.error('Failed to fetch users:', err);
+        console.error('Failed to decode token or fetch user:', err);
       }
     };
 
@@ -41,15 +50,15 @@ const Navbar = () => {
   }, []);
 
   const handleSignOut = () => {
-    localStorage.removeItem("user"); // Remove user from storage
-    setUser(null);
-    router.push("/"); // Redirect to home after logout
+    localStorage.removeItem("token");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userName");
+    setUserName('');
+    router.push("/");
   };
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    // { name: 'Services', path: '/services' },
-    // { name: 'About Us', path: '/About' },
     { name: 'Contact Us', path: '/contact' },
   ];
 
@@ -61,7 +70,6 @@ const Navbar = () => {
         </Link>
       </div>
 
-      {/* Desktop Navigation */}
       <div className='navbar-center desktop-only'>
         {navLinks.map((link) => (
           <Link
@@ -75,22 +83,21 @@ const Navbar = () => {
       </div>
 
       <div className='navbar-right'>
-        {/* Desktop Auth Section */}
         <div className='auth-buttons desktop-only'>
           {userName ? (
             <>
               <span className="hello-user">Hello, {userName}</span>
+              <Link href='/dashboard' className="sign-in-btn">My Dashboard</Link>
               <button onClick={handleSignOut} className="sign-out-btn">Sign Out</button>
             </>
           ) : (
             <>
-              <Link href='/signin-doctor' className='sign-in-btn '>Login As Doctor</Link>
+              <Link href='/signin-doctor' className='sign-in-btn'>Login As Doctor</Link>
               <Link href='/signin' className='sign-up-btn'>Login As Patient</Link>
             </>
           )}
         </div>
 
-        {/* Mobile Menu Button */}
         <button
           ref={buttonRef}
           className='hamburger-btn mobile-only'
@@ -104,7 +111,6 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile Navigation Menu */}
       <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
         {navLinks.map((link) => (
           <Link
@@ -120,12 +126,13 @@ const Navbar = () => {
         <div className='mobile-auth-buttons'>
           {userName ? (
             <>
-              <span className="hello-user">Hello, {userName} !</span>
+              <span className="hello-user">Hello, {userName}!</span>
+              <Link href='/dashboard' className="mobile-sign-up-btn" onClick={() => setIsMenuOpen(false)}>My Dashboard</Link>
               <button onClick={handleSignOut} className="mobile-sign-out-btn">Sign Out</button>
             </>
           ) : (
             <>
-              <Link href='/signup' className='mobile-sign-up-btn' onClick={() => setIsMenuOpen(false)}>Login As Doctor</Link>
+              <Link href='/signin-doctor' className='mobile-sign-up-btn' onClick={() => setIsMenuOpen(false)}>Login As Doctor</Link>
               <Link href='/signin' className='mobile-sign-in-btn' onClick={() => setIsMenuOpen(false)}>Login As Patient</Link>
             </>
           )}

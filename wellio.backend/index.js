@@ -105,8 +105,7 @@ const Users = mongoose.model('Users', new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    status: { type: String, required: true },
-    image_code: { type: String, required: true },
+    status: { type: String, required: false },
     doctor: { type: String, required: true },
     address: { type: String, required: true },
     date: { type: Date, default: Date.now }
@@ -116,36 +115,35 @@ const pendingVerifications = {}; // Store pending email verifications
 
 app.post('/signup', async (req, res) => {
     try {
-        const { name, email, password, status, image_code, doctor, address } = req.body;
+        const { name, email, password, doctor, status, address } = req.body;
 
-        // Validate input
-        if (!name || !email || !password || !status || !image_code || !address) {
+        // Validate required fields
+        if (!name || !email || !password || !doctor || !address) {
             return res.status(400).json({ success: false, errors: "All fields are required." });
         }
 
-        // Check if email already exists
+        // Check for existing user
         const existingUser = await Users.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({
-                success: false,
-                errors: "Email is already registered."
-            });
+            return res.status(400).json({ success: false, errors: "Email is already registered." });
         }
 
+        // Generate verification code
         const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
+        // Store temporarily for verification
         pendingVerifications[email] = {
             name,
             email,
             password,
             status,
-            image_code,
-            doctor: !!doctor,
+            doctor, // string
             address,
             verificationCode,
             createdAt: Date.now()
         };
 
+        // Send email
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -159,21 +157,20 @@ app.post('/signup', async (req, res) => {
             to: email,
             subject: 'Welcome to Wellio – Verify Your Email',
             html: `
-        <html>
-            <body style="background-color: #1d3c34; color: white; font-family: Arial, sans-serif; padding: 20px;">
-                <h1 style="color: #4CAF50;">Welcome to Wellio, ${name}!</h1>
-                <p style="font-size: 18px;">Thank you for signing up.</p>
-                <p style="font-size: 18px;">Your verification code is:</p>
-                <h2 style="font-size: 32px; color: #ffffff; background-color: #4CAF50; display: inline-block; padding: 10px 20px; border-radius: 8px;">
-                    ${verificationCode}
-                </h2>
-                <p style="font-size: 14px; margin-top: 20px;">Enter this code in the app to complete your registration.</p>
-                <p style="font-size: 14px;">If you didn’t request this, you can safely ignore this email.</p>
-            </body>
-        </html>
-    `
+            <html>
+                <body style="background-color: #1d3c34; color: white; font-family: Arial, sans-serif; padding: 20px;">
+                    <h1 style="color: #4CAF50;">Welcome to Wellio, ${name}!</h1>
+                    <p style="font-size: 18px;">Thank you for signing up.</p>
+                    <p style="font-size: 18px;">Your verification code is:</p>
+                    <h2 style="font-size: 32px; color: #ffffff; background-color: #4CAF50; display: inline-block; padding: 10px 20px; border-radius: 8px;">
+                        ${verificationCode}
+                    </h2>
+                    <p style="font-size: 14px; margin-top: 20px;">Enter this code in the app to complete your registration.</p>
+                    <p style="font-size: 14px;">If you didn’t request this, you can safely ignore this email.</p>
+                </body>
+            </html>
+        `
         });
-
 
         res.json({ success: true, message: "Please verify your email address." });
 
@@ -196,19 +193,18 @@ app.post('/verify-email', async (req, res) => {
             return res.status(400).json({ success: false, errors: "Invalid verification code." });
         }
 
-        // Save all user fields from pending verification
+        // Save verified user to DB
         const user = new Users({
             name: pendingUser.name,
             email: pendingUser.email,
             password: pendingUser.password,
             status: pendingUser.status,
-            image_code: pendingUser.image_code,
             doctor: pendingUser.doctor,
             address: pendingUser.address
         });
 
         await user.save();
-        delete pendingVerifications[email];
+        delete pendingVerifications[email]; // Cleanup
 
         res.json({ success: true, message: "Email verified successfully." });
     } catch (error) {
@@ -216,6 +212,7 @@ app.post('/verify-email', async (req, res) => {
         res.status(500).json({ error: "Verification failed." });
     }
 });
+
 
 // Login route
 app.post('/login', async (req, res) => {
@@ -231,7 +228,18 @@ app.post('/login', async (req, res) => {
             return res.json({ success: false, errors: "Incorrect password" });
         }
 
-        const token = jwt.sign({ user: { id: user.id } }, 'secret_ecom', { expiresIn: '730h' });
+        const token = jwt.sign(
+            {
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    appUser: "Patient"
+                }
+            },
+            'secret_ecom',
+            { expiresIn: '730h' }
+        );
+
         res.json({ success: true, token });
 
     } catch (error) {
@@ -545,7 +553,17 @@ app.post('/doctor/login', async (req, res) => {
             return res.json({ success: false, errors: "Incorrect password" });
         }
 
-        const token = jwt.sign({ doctor: { id: doctor.id } }, 'secret_doctor', { expiresIn: '730h' });
+        const token = jwt.sign(
+            {
+                doctor: {
+                    id: doctor.id,
+                    email: doctor.email,
+                    appUser: "Doctor"
+                }
+            },
+            'secret_doctor',
+            { expiresIn: '730h' }
+        );
 
         res.json({
             success: true,

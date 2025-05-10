@@ -11,8 +11,6 @@ export default function Signup() {
     name: '',
     email: '',
     password: '',
-    status: '',
-    image_code: '',
     doctor: '',
     address: ''
   });
@@ -116,12 +114,6 @@ export default function Signup() {
               </div>
               <div className='input-order'><label>Password</label>
                 <input type="password" name="password" value={formData.password} onChange={handleChange} required />
-              </div>
-              <div className='input-order'><label>Status</label>
-                <input type="text" name="status" value={formData.status} onChange={handleChange} required />
-              </div>
-              <div className='input-order'><label>Image Code</label>
-                <input type="text" name="image_code" value={formData.image_code} onChange={handleChange} required />
               </div>
               <div className='input-order'><label>Doctor</label>
                 <input type="text" name="doctor" value={formData.doctor} onChange={handleChange} required />
