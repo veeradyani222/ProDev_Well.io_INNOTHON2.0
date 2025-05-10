@@ -771,58 +771,150 @@ const users = [
     name: "Veer Adyani",
     email: "veeradyani12@gmail.com",
     gender: "Male",
-    age: 20
+    age: 20,
+    height: 170,
+    weight: 60,
+    bloodGroup: "O+",
+    allergies: "None",
+    medications: "None",
+    medicalHistory: "None",
+    familyHistory: "None",
+    lifestyle: "Active",
+    sleep: "7 hours",
+    diet: "Balanced",
+    exercise: "Regular",
+    stressLevel: "Low",
+    hydration: "Adequate",
+    smoking: "No",
+    alcohol: "No",
+    caffeine: "Moderate",
+    screenTime: "2 hours"
   },
   {
     name: "Shorya Jain",
     email: "shorya1016@gmail.com",
     gender: "Female",
-    age: 22
+    age: 22,
+    height: 160,
+    weight: 55,
+    bloodGroup: "A+",
+    allergies: "Pollen",
+    medications: "Antihistamines",
+    medicalHistory: "Asthma",
+    familyHistory: "Diabetes",
+    lifestyle: "Moderate",
+    sleep: "6 hours",
+    diet: "Vegetarian",
+    exercise: "Occasional",
+    stressLevel: "Medium",
+    hydration: "Low",
+    smoking: "No",
+    alcohol: "Occasionally",
+    caffeine: "Low",
+    screenTime: "5 hours"
   },
   {
     name: "Priya Sharma",
     email: "shorya.2098@gmail.com",
     gender: "Female",
-    age: 24
+    age: 24,
+    height: 165,
+    weight: 58,
+    bloodGroup: "B+",
+    allergies: "Dust",
+    medications: "None",
+    medicalHistory: "Migraines",
+    familyHistory: "Hypertension",
+    lifestyle: "Active",
+    sleep: "8 hours",
+    diet: "Balanced",
+    exercise: "Regular",
+    stressLevel: "Low",
+    hydration: "High",
+    smoking: "No",
+    alcohol: "No",
+    caffeine: "High",
+    screenTime: "3 hours"
   },
   {
     name: "Vaidik Sule",
     email: "vaidiksule@gmail.com",
     gender: "Male",
-    age: 21
+    age: 21,
+    height: 175,
+    weight: 70,
+    bloodGroup: "AB+",
+    allergies: "None",
+    medications: "None",
+    medicalHistory: "None",
+    familyHistory: "Heart Disease",
+    lifestyle: "Sedentary",
+    sleep: "5 hours",
+    diet: "High-Protein",
+    exercise: "Rare",
+    stressLevel: "High",
+    hydration: "Low",
+    smoking: "Yes",
+    alcohol: "Yes",
+    caffeine: "High",
+    screenTime: "7 hours"
   },
   {
     name: "Ishita Sule",
     email: "vaidiksulemusic@gmail.com",
     gender: "Female",
-    age: 23
+    age: 23,
+    height: 162,
+    weight: 52,
+    bloodGroup: "O-",
+    allergies: "Nuts",
+    medications: "Epinephrine",
+    medicalHistory: "Allergies",
+    familyHistory: "None",
+    lifestyle: "Active",
+    sleep: "7.5 hours",
+    diet: "Gluten-Free",
+    exercise: "Regular",
+    stressLevel: "Medium",
+    hydration: "Adequate",
+    smoking: "No",
+    alcohol: "Rarely",
+    caffeine: "Low",
+    screenTime: "4 hours"
   }
 ];
 
+
 // Generate random vitals
 function getRandomVital({ min, max, abnormalMin, abnormalMax }) {
-    const isAbnormal = Math.random() < 0.3; // 30% chance abnormal
-    if (!isAbnormal) return +(Math.random() * (max - min) + min).toFixed(1);
-    return Math.random() < 0.5
-        ? +(Math.random() * (abnormalMin.max - abnormalMin.min) + abnormalMin.min).toFixed(1)
-        : +(Math.random() * (abnormalMax.max - abnormalMax.min) + abnormalMax.min).toFixed(1);
+  const isAbnormal = Math.random() < 0.3; // 30% chance abnormal
+  if (!isAbnormal) return +(Math.random() * (max - min) + min).toFixed(1);
+  return Math.random() < 0.5
+    ? +(Math.random() * (abnormalMin.max - abnormalMin.min) + abnormalMin.min).toFixed(1)
+    : +(Math.random() * (abnormalMax.max - abnormalMax.min) + abnormalMax.min).toFixed(1);
 }
 
-// Return updated vitals for each call
 function getUserVitals() {
-    return users.map(user => {
-        return {
-            ...user,
-            vitals: {
-                bloodPressure: `${Math.floor(getRandomVital({ min: 90, max: 120, abnormalMin: { min: 70, max: 89 }, abnormalMax: { min: 121, max: 160 } }))}/${Math.floor(getRandomVital({ min: 60, max: 80, abnormalMin: { min: 40, max: 59 }, abnormalMax: { min: 81, max: 100 } }))}`,
-                oxygenLevel: getRandomVital({ min: 95, max: 100, abnormalMin: { min: 80, max: 89 }, abnormalMax: { min: 101, max: 105 } }),
-                heartbeat: getRandomVital({ min: 60, max: 100, abnormalMin: { min: 30, max: 59 }, abnormalMax: { min: 101, max: 150 } }),
-                temperature: getRandomVital({ min: 97, max: 99, abnormalMin: { min: 95, max: 96.9 }, abnormalMax: { min: 99.1, max: 103 } }),
-                breathingRate: getRandomVital({ min: 12, max: 20, abnormalMin: { min: 6, max: 11 }, abnormalMax: { min: 21, max: 30 } }),
-            }
-        };
-    });
+  return users.map(user => {
+    return {
+      ...user,
+      vitals: {
+        bloodPressure: `${Math.floor(getRandomVital({ min: 90, max: 120, abnormalMin: { min: 70, max: 89 }, abnormalMax: { min: 121, max: 160 } }))}/${Math.floor(getRandomVital({ min: 60, max: 80, abnormalMin: { min: 40, max: 59 }, abnormalMax: { min: 81, max: 100 } }))}`,
+        oxygenLevel: getRandomVital({ min: 95, max: 100, abnormalMin: { min: 80, max: 89 }, abnormalMax: { min: 101, max: 105 } }),
+        heartbeat: getRandomVital({ min: 60, max: 100, abnormalMin: { min: 30, max: 59 }, abnormalMax: { min: 101, max: 150 } }),
+        temperature: getRandomVital({ min: 97, max: 99, abnormalMin: { min: 95, max: 96.9 }, abnormalMax: { min: 99.1, max: 103 } }),
+        breathingRate: getRandomVital({ min: 12, max: 20, abnormalMin: { min: 6, max: 11 }, abnormalMax: { min: 21, max: 30 } }),
+        heartRateVariability: getRandomVital({ min: 20, max: 100, abnormalMin: { min: 5, max: 19 }, abnormalMax: { min: 101, max: 150 } }), // ms
+        vo2Max: getRandomVital({ min: 35, max: 50, abnormalMin: { min: 20, max: 34 }, abnormalMax: { min: 51, max: 70 } }), // ml/kg/min
+        sleepDuration: getRandomVital({ min: 6, max: 9, abnormalMin: { min: 3, max: 5.9 }, abnormalMax: { min: 9.1, max: 12 } }), // in hours
+        steps: Math.floor(getRandomVital({ min: 5000, max: 12000, abnormalMin: { min: 0, max: 4999 }, abnormalMax: { min: 12001, max: 20000 } })), // steps
+        caloriesBurned: Math.floor(getRandomVital({ min: 1500, max: 2500, abnormalMin: { min: 800, max: 1499 }, abnormalMax: { min: 2501, max: 3500 } })), // kcal
+        noiseLevel: getRandomVital({ min: 30, max: 80, abnormalMin: { min: 10, max: 29 }, abnormalMax: { min: 81, max: 100 } }) // dB
+      }
+    };
+  });
 };
+
 
 app.get('/api/vitals', (req, res) => {
     res.json(getUserVitals());

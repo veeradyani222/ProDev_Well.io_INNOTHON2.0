@@ -94,7 +94,7 @@ export default function Dashboard() {
         )}
       </div>
 
-
+        
 
       <div className="right-side">
         <div className="doctor-info">

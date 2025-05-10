@@ -15,28 +15,33 @@ export default function SignIn() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError(null);
 
-    try {
-      const response = await fetch('https://wellio-backend.onrender.com/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+  try {
+    const response = await fetch('https://wellio-backend.onrender.com/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
 
-      const data = await response.json();
-      if (data.success) {
-        localStorage.setItem('token', data.token); // Store token if needed
-    window.location.href = '/';
-      } else {
-        setError(data.errors || 'Login failed.');
-      }
-    } catch {
-      setError('Login failed.');
+    const data = await response.json();
+
+    if (data.success) {
+      const token = data.token;
+      localStorage.setItem('token', token);
+      window.location.href = '/PatientDashboard';
+    } else {
+      setError(data.errors || 'Login failed.');
     }
-  };
+  } catch (err) {
+    console.error("Login error:", err);
+    setError('Login failed.');
+  }
+};
+
+ 
 
   return (
     <div>

@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@lottiefiles/dotlottie-react": "^0.13.5",
+    "@mui/material": "^7.1.0",
+    "@tailwindcss/postcss": "^4.1.6",
     "@types/next": "^8.0.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -17,11 +19,13 @@
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.509.0",
     "next": "^15.3.2",
+    "postcss": "^8.5.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "recharts": "^2.15.3",
     "tailwind": "^4.0.0",
-    "tailwind-merge": "^3.2.0"
+    "tailwind-merge": "^3.2.0",
+    "tailwindcss": "^4.1.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
