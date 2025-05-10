@@ -169,6 +169,18 @@
     margin: 0 auto;
 }
 
+.input-order select {
+    width: 31.5vw;
+    padding: 12px;
+    border: 1px solid var(--input-border);
+    border-radius: 5px;
+    font-size: 14px;
+    margin-bottom: 25px;
+    color: var(--text-color);
+    font-family: var(--font-family);
+    background: var(--white);
+}
+
 .orusecont {
     display: flex;
     justify-content: center;
@@ -210,6 +222,8 @@
     justify-content: space-between;
     align-items: center;
 }
+
+
 
 @media screen and (max-width: 500px) {
     .signup-container {
@@ -281,5 +295,9 @@
 
     .signup-container .signinbtn {
         width: 70vw;
+    }
+
+    .input-order select {
+        width: 85vw;
     }
 }
