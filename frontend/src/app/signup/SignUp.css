@@ -35,10 +35,6 @@
     margin: 5vh auto;
 }
 
-.signupheads-head {
-    margin-bottom: 10vh;
-}
-
 .signupheads {
     display: flex;
     flex-direction: column;
