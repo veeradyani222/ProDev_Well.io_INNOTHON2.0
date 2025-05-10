@@ -768,184 +768,178 @@ app.get('/alldoctors', async (req, res) => {
 
 
 const users = [
-  {
-    name: "Veer Adyani",
-    email: "veeradyani12@gmail.com",
-    gender: "Male",
-    age: 20,
-    height: 170,
-    weight: 60,
-    bloodGroup: "O+",
-    allergies: "None",
-    medications: "None",
-    medicalHistory: "None",
-    familyHistory: "None",
-    lifestyle: "Active",
-    sleep: "7 hours",
-    diet: "Balanced",
-    exercise: "Regular",
-    stressLevel: "Low",
-    hydration: "Adequate",
-    smoking: "No",
-    alcohol: "No",
-    caffeine: "Moderate",
-    screenTime: "2 hours"
-  },
-  {
-    name: "Shorya Jain",
-    email: "shorya1016@gmail.com",
-    gender: "Female",
-    age: 22,
-    height: 160,
-    weight: 55,
-    bloodGroup: "A+",
-    allergies: "Pollen",
-    medications: "Antihistamines",
-    medicalHistory: "Asthma",
-    familyHistory: "Diabetes",
-    lifestyle: "Moderate",
-    sleep: "6 hours",
-    diet: "Vegetarian",
-    exercise: "Occasional",
-    stressLevel: "Medium",
-    hydration: "Low",
-    smoking: "No",
-    alcohol: "Occasionally",
-    caffeine: "Low",
-    screenTime: "5 hours"
-  },
-  {
-    name: "Priya Sharma",
-    email: "shorya.2098@gmail.com",
-    gender: "Female",
-    age: 24,
-    height: 165,
-    weight: 58,
-    bloodGroup: "B+",
-    allergies: "Dust",
-    medications: "None",
-    medicalHistory: "Migraines",
-    familyHistory: "Hypertension",
-    lifestyle: "Active",
-    sleep: "8 hours",
-    diet: "Balanced",
-    exercise: "Regular",
-    stressLevel: "Low",
-    hydration: "High",
-    smoking: "No",
-    alcohol: "No",
-    caffeine: "High",
-    screenTime: "3 hours"
-  },
-  {
-    name: "Vaidik Sule",
-    email: "vaidiksule@gmail.com",
-    gender: "Male",
-    age: 21,
-    height: 175,
-    weight: 70,
-    bloodGroup: "AB+",
-    allergies: "None",
-    medications: "None",
-    medicalHistory: "None",
-    familyHistory: "Heart Disease",
-    lifestyle: "Sedentary",
-    sleep: "5 hours",
-    diet: "High-Protein",
-    exercise: "Rare",
-    stressLevel: "High",
-    hydration: "Low",
-    smoking: "Yes",
-    alcohol: "Yes",
-    caffeine: "High",
-    screenTime: "7 hours"
-  },
-  {
-    name: "Ishita Sule",
-    email: "vaidiksulemusic@gmail.com",
-    gender: "Female",
-    age: 23,
-    height: 162,
-    weight: 52,
-    bloodGroup: "O-",
-    allergies: "Nuts",
-    medications: "Epinephrine",
-    medicalHistory: "Allergies",
-    familyHistory: "None",
-    lifestyle: "Active",
-    sleep: "7.5 hours",
-    diet: "Gluten-Free",
-    exercise: "Regular",
-    stressLevel: "Medium",
-    hydration: "Adequate",
-    smoking: "No",
-    alcohol: "Rarely",
-    caffeine: "Low",
-    screenTime: "4 hours"
-  }
+    {
+        name: "Veer Adyani",
+        email: "veeradyani12@gmail.com",
+        gender: "Male",
+        age: 20,
+        height: 170,
+        weight: 60,
+        bloodGroup: "O+",
+        allergies: "None",
+        medications: "None",
+        medicalHistory: "None",
+        familyHistory: "None",
+        lifestyle: "Active",
+        sleep: "7 hours",
+        diet: "Balanced",
+        exercise: "Regular",
+        stressLevel: "Low",
+        hydration: "Adequate",
+        smoking: "No",
+        alcohol: "No",
+        caffeine: "Moderate",
+        screenTime: "2 hours"
+    },
+    {
+        name: "Shorya Jain",
+        email: "shorya1016@gmail.com",
+        gender: "Female",
+        age: 22,
+        height: 160,
+        weight: 55,
+        bloodGroup: "A+",
+        allergies: "Pollen",
+        medications: "Antihistamines",
+        medicalHistory: "Asthma",
+        familyHistory: "Diabetes",
+        lifestyle: "Moderate",
+        sleep: "6 hours",
+        diet: "Vegetarian",
+        exercise: "Occasional",
+        stressLevel: "Medium",
+        hydration: "Low",
+        smoking: "No",
+        alcohol: "Occasionally",
+        caffeine: "Low",
+        screenTime: "5 hours"
+    },
+    {
+        name: "Priya Sharma",
+        email: "shorya.2098@gmail.com",
+        gender: "Female",
+        age: 24,
+        height: 165,
+        weight: 58,
+        bloodGroup: "B+",
+        allergies: "Dust",
+        medications: "None",
+        medicalHistory: "Migraines",
+        familyHistory: "Hypertension",
+        lifestyle: "Active",
+        sleep: "8 hours",
+        diet: "Balanced",
+        exercise: "Regular",
+        stressLevel: "Low",
+        hydration: "High",
+        smoking: "No",
+        alcohol: "No",
+        caffeine: "High",
+        screenTime: "3 hours"
+    },
+    {
+        name: "Vaidik Sule",
+        email: "vaidiksule@gmail.com",
+        gender: "Male",
+        age: 21,
+        height: 175,
+        weight: 70,
+        bloodGroup: "AB+",
+        allergies: "None",
+        medications: "None",
+        medicalHistory: "None",
+        familyHistory: "Heart Disease",
+        lifestyle: "Sedentary",
+        sleep: "5 hours",
+        diet: "High-Protein",
+        exercise: "Rare",
+        stressLevel: "High",
+        hydration: "Low",
+        smoking: "Yes",
+        alcohol: "Yes",
+        caffeine: "High",
+        screenTime: "7 hours"
+    },
+    {
+        name: "Ishita Sule",
+        email: "vaidiksulemusic@gmail.com",
+        gender: "Female",
+        age: 23,
+        height: 162,
+        weight: 52,
+        bloodGroup: "O-",
+        allergies: "Nuts",
+        medications: "Epinephrine",
+        medicalHistory: "Allergies",
+        familyHistory: "None",
+        lifestyle: "Active",
+        sleep: "7.5 hours",
+        diet: "Gluten-Free",
+        exercise: "Regular",
+        stressLevel: "Medium",
+        hydration: "Adequate",
+        smoking: "No",
+        alcohol: "Rarely",
+        caffeine: "Low",
+        screenTime: "4 hours"
+    }
 ];
 
 
 // Generate random vitals
-let cachedVitals = [];
-let lastUpdateTime = 0;
-const UPDATE_INTERVAL = 90 * 10; // 1.5 minutes
-
-function getStableVitals(user) {
-  return {
-    ...user,
-    vitals: {
-      bloodPressure: `${getRandomInRange(110, 120)}/${getRandomInRange(70, 80)}`,
-      oxygenLevel: getRandomInRange(96, 100),
-      heartbeat: getRandomInRange(60, 100),
-      temperature: getRandomInRange(97, 99),
-      breathingRate: getRandomInRange(12, 18),
-      heartRateVariability: getRandomInRange(40, 80),
-      vo2Max: getRandomInRange(35, 45),
-      sleepDuration: getRandomInRange(7, 8.5), // average per day
-      steps: user.vitals?.steps ? user.vitals.steps + getRandomInRange(10, 50) : getRandomInRange(1000, 3000),
-      caloriesBurned: user.vitals?.caloriesBurned ? user.vitals.caloriesBurned + getRandomInRange(20, 50) : getRandomInRange(500, 800),
-      noiseLevel: getRandomInRange(30, 70)
-    }
-  };
-}
-
-function getRandomInRange(min, max) {
-  return +(Math.random() * (max - min) + min).toFixed(1);
+function getRandomVital({ min, max, abnormalMin, abnormalMax }) {
+    const isAbnormal = Math.random() < 0.3; // 30% chance abnormal
+    if (!isAbnormal) return +(Math.random() * (max - min) + min).toFixed(1);
+    return Math.random() < 0.5
+        ? +(Math.random() * (abnormalMin.max - abnormalMin.min) + abnormalMin.min).toFixed(1)
+        : +(Math.random() * (abnormalMax.max - abnormalMax.min) + abnormalMax.min).toFixed(1);
 }
 
 function getUserVitals() {
-  const now = Date.now();
-  if (!cachedVitals.length || now - lastUpdateTime > UPDATE_INTERVAL) {
-    cachedVitals = users.map(user => getStableVitals(user));
-    lastUpdateTime = now;
-  }
-  return cachedVitals;
-}
+    return users.map(user => {
+        return {
+            ...user,
+            vitals: {
+                bloodPressure: `${Math.floor(getRandomVital({ min: 90, max: 120, abnormalMin: { min: 70, max: 89 }, abnormalMax: { min: 121, max: 160 } }))}/${Math.floor(getRandomVital({ min: 60, max: 80, abnormalMin: { min: 40, max: 59 }, abnormalMax: { min: 81, max: 100 } }))}`,
+                oxygenLevel: getRandomVital({ min: 95, max: 100, abnormalMin: { min: 80, max: 89 }, abnormalMax: { min: 101, max: 105 } }),
+                heartbeat: getRandomVital({ min: 60, max: 100, abnormalMin: { min: 30, max: 59 }, abnormalMax: { min: 101, max: 150 } }),
+                temperature: getRandomVital({ min: 97, max: 99, abnormalMin: { min: 95, max: 96.9 }, abnormalMax: { min: 99.1, max: 103 } }),
+                breathingRate: getRandomVital({ min: 12, max: 20, abnormalMin: { min: 6, max: 11 }, abnormalMax: { min: 21, max: 30 } }),
+                heartRateVariability: getRandomVital({ min: 20, max: 100, abnormalMin: { min: 5, max: 19 }, abnormalMax: { min: 101, max: 150 } }), // ms
+                vo2Max: getRandomVital({ min: 35, max: 50, abnormalMin: { min: 20, max: 34 }, abnormalMax: { min: 51, max: 70 } }), // ml/kg/min
+                sleepDuration: getRandomVital({ min: 6, max: 9, abnormalMin: { min: 3, max: 5.9 }, abnormalMax: { min: 9.1, max: 12 } }), // in hours
+                steps: Math.floor(getRandomVital({ min: 5000, max: 12000, abnormalMin: { min: 0, max: 4999 }, abnormalMax: { min: 12001, max: 20000 } })), // steps
+                caloriesBurned: Math.floor(getRandomVital({ min: 1500, max: 2500, abnormalMin: { min: 800, max: 1499 }, abnormalMax: { min: 2501, max: 3500 } })), // kcal
+                noiseLevel: getRandomVital({ min: 30, max: 80, abnormalMin: { min: 10, max: 29 }, abnormalMax: { min: 81, max: 100 } }) // dB
+            }
+        };
+    });
+};
+
 
 app.get('/api/vitals', (req, res) => {
-  res.json(getUserVitals());
+    res.json(getUserVitals());
 });
 
 // Initialize OpenAI with the API key
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+    apiKey: process.env.OPENAI_API_KEY,
 });
 
 app.post('/api/get-health-ai', async (req, res) => {
-  const { vitalsHistory, staticData } = req.body;
+    const { vitalsHistory, staticData } = req.body;
 
-  if (!vitalsHistory || !staticData) {
-    return res.status(400).json({ error: 'Missing vitals or static data' });
-  }
+    if (!vitalsHistory || !staticData) {
+        return res.status(400).json({ error: 'Missing vitals or static data' });
+    }
 
-  const tipPrompt = `
+    const tipPrompt = `
 You are a health assistant. Based on this 10-minute rolling vitals data:\n
 ${JSON.stringify(vitalsHistory, null, 2)}\n
 Give a short, friendly, personalized one-sentence health tip.
 `;
 
-  const summaryPrompt = `
+    const summaryPrompt = `
 You are a smart health analyst. Based on the vitals:\n
 ${JSON.stringify(vitalsHistory, null, 2)}\n
 and static patient data (like allergies, diet, exercise, lifestyle):\n
@@ -953,26 +947,26 @@ ${JSON.stringify(staticData, null, 2)}\n
 Give a short summary of their health in two sentences and suggest one improvement.
 `;
 
-  try {
-    const [tipResponse, summaryResponse] = await Promise.all([
-      openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: tipPrompt }],
-      }),
-      openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: summaryPrompt }],
-      }),
-    ]);
+    try {
+        const [tipResponse, summaryResponse] = await Promise.all([
+            openai.chat.completions.create({
+                model: 'gpt-3.5-turbo',
+                messages: [{ role: 'user', content: tipPrompt }],
+            }),
+            openai.chat.completions.create({
+                model: 'gpt-3.5-turbo',
+                messages: [{ role: 'user', content: summaryPrompt }],
+            }),
+        ]);
 
-    const tip = tipResponse.choices[0].message.content.trim();
-    const summary = summaryResponse.choices[0].message.content.trim();
+        const tip = tipResponse.choices[0].message.content.trim();
+        const summary = summaryResponse.choices[0].message.content.trim();
 
-    return res.json({ tip, summary });
-  } catch (error) {
-    console.error('OpenAI API error:', error.message);
-    return res.status(500).json({ error: 'Failed to generate AI response' });
-  }
+        return res.json({ tip, summary });
+    } catch (error) {
+        console.error('OpenAI API error:', error.message);
+        return res.status(500).json({ error: 'Failed to generate AI response' });
+    }
 });
 
 app.listen(port, (error) => {
