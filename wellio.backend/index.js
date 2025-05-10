@@ -889,7 +889,7 @@ const users = [
 // Generate random vitals
 let cachedVitals = [];
 let lastUpdateTime = 0;
-const UPDATE_INTERVAL = 90 * 1000; // 1.5 minutes
+const UPDATE_INTERVAL = 90 * 10; // 1.5 minutes
 
 function getStableVitals(user) {
   return {
@@ -917,10 +917,7 @@ function getRandomInRange(min, max) {
 function getUserVitals() {
   const now = Date.now();
   if (!cachedVitals.length || now - lastUpdateTime > UPDATE_INTERVAL) {
-    cachedVitals = users.map(user => {
-      const oldUser = cachedVitals.find(u => u.id === user.id) || {};
-      return getStableVitals(oldUser);
-    });
+    cachedVitals = users.map(user => getStableVitals(user));
     lastUpdateTime = now;
   }
   return cachedVitals;

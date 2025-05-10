@@ -25,7 +25,7 @@ export default function Dashboard() {
         setUser(foundUser || null);
 
         const interval = setInterval(async () => {
-          const vitalsRes = await fetch('https://wellio-backend.onrender.com/api/vitals');
+          const vitalsRes = await fetch('http://localhost:4000/api/vitals');
           const vitalsData = await vitalsRes.json();
           const foundVitals = vitalsData.find(v => v.email === email);
           setVitals(foundVitals || null);
