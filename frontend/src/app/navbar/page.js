@@ -1,66 +1,63 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';  // Import useRouter
+import jwt from 'jsonwebtoken';  // For decoding the token
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import Logo from './../assets/wellio-logo.svg';
 import Menu from './../assets/Menubtn.svg';
 import Remove from './../assets/remove.svg';
 import { usePathname } from 'next/navigation';
-import jwt_decode from 'jwt-decode';
 import './Navbar.css';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [userName, setUserName] = useState('');
+  const [userRole, setUserRole] = useState('');  // Store the role (Patient/Doctor)
+  const [isClient, setIsClient] = useState(false);  // State to track if the component is mounted
   const pathname = usePathname();
-  const buttonRef = useRef(null);
-  const router = useRouter();
+  
+  // UseEffect to ensure the component is mounted before using useRouter
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const router = useRouter();  // Use router only when component is mounted
 
   useEffect(() => {
-    const fetchUserName = async () => {
+    const fetchUserRole = async () => {
       const token = localStorage.getItem('token');
       if (!token) return;
 
       try {
-        const decoded = jwt_decode(token);
-        const userInfo = decoded?.user || decoded?.doctor;
-        const email = userInfo?.email;
-        const appUser = userInfo?.appUser;
-
-        if (!email || !appUser) return;
-
-        localStorage.setItem("userEmail", email);
-
-        const response = await fetch('https://doord.onrender.com/allusers');
-        const users = await response.json();
-
-        const foundUser = users.find(u => u.email === email);
-        if (foundUser) {
-          setUserName(foundUser.name);
-          localStorage.setItem("userName", foundUser.name);
+        const decoded = jwt.decode(token);  // Decode the JWT token
+        if (decoded && decoded.user) {
+          setUserRole(decoded.user.appUser);  // Set the user's role (Patient/Doctor)
         }
       } catch (err) {
-        console.error('Failed to decode token or fetch user:', err);
+        console.error('Failed to decode token:', err);
       }
     };
 
-    fetchUserName();
+    fetchUserRole();
   }, []);
 
   const handleSignOut = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userName");
-    setUserName('');
-    router.push("/");
+    localStorage.removeItem("token");  // Remove token from local storage
+    setUserRole('');  // Reset user role
+    router.push('/');  // Redirect to homepage after logout
   };
 
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Contact Us', path: '/contact' },
-  ];
+  const handleDashboardRedirect = () => {
+    if (userRole === 'Patient') {
+      router.push('/PatientDashboard');  // Redirect to Patient Dashboard
+    } else if (userRole === 'Doctor') {
+      router.push('/DoctorDashboard');  // Redirect to Doctor Dashboard
+    }
+  };
+
+  // Only render the component if it's mounted (client-side)
+  if (!isClient) return null;
 
   return (
     <div className='navbar'>
@@ -70,70 +67,52 @@ const Navbar = () => {
         </Link>
       </div>
 
+      {/* Desktop Navigation */}
       <div className='navbar-center desktop-only'>
-        {navLinks.map((link) => (
-          <Link
-            key={link.path}
-            href={link.path}
-            className={`nav-link ${pathname === link.path ? 'active' : ''}`}
-          >
-            {link.name}
-          </Link>
-        ))}
+        <Link href='/' className={`nav-link ${pathname === '/' ? 'active' : ''}`}>Home</Link>
+        <Link href='/contact' className={`nav-link ${pathname === '/contact' ? 'active' : ''}`}>Contact Us</Link>
       </div>
 
       <div className='navbar-right'>
+        {/* Desktop Auth Section */}
         <div className='auth-buttons desktop-only'>
-          {userName ? (
+          {userRole ? (
             <>
-              <span className="hello-user">Hello, {userName}</span>
-              <Link href='/dashboard' className="sign-in-btn">My Dashboard</Link>
-              <button onClick={handleSignOut} className="sign-out-btn">Sign Out</button>
+              <button onClick={handleDashboardRedirect} className="sign-up-btn">Dashboard</button>
+              <button onClick={handleSignOut} className="sign-in-btn">Sign Out</button>
             </>
           ) : (
             <>
               <Link href='/signin-doctor' className='sign-in-btn'>Login As Doctor</Link>
-              <Link href='/signin' className='sign-up-btn'>Login As Patient</Link>
+            <Link href='/signin' className='sign-up-btn'>Login As Patient</Link>
             </>
           )}
         </div>
 
+        {/* Mobile Menu Button */}
         <button
-          ref={buttonRef}
           className='hamburger-btn mobile-only'
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
-          <Image
-            className='menu-icon'
-            src={isMenuOpen ? Remove : Menu}
-            alt='menu'
-          />
+          <Image className='menu-icon' src={isMenuOpen ? Remove : Menu} alt='menu' />
         </button>
       </div>
 
+      {/* Mobile Navigation Menu */}
       <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
-        {navLinks.map((link) => (
-          <Link
-            key={link.path}
-            href={link.path}
-            className={`mobile-nav-link ${pathname === link.path ? 'active' : ''}`}
-            onClick={() => setIsMenuOpen(false)}
-          >
-            {link.name}
-          </Link>
-        ))}
+        <Link href='/' className={`mobile-nav-link ${pathname === '/' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Home</Link>
+        <Link href='/contact' className={`mobile-nav-link ${pathname === '/contact' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Contact Us</Link>
 
         <div className='mobile-auth-buttons'>
-          {userName ? (
+          {userRole ? (
             <>
-              <span className="hello-user">Hello, {userName}!</span>
-              <Link href='/dashboard' className="mobile-sign-up-btn" onClick={() => setIsMenuOpen(false)}>My Dashboard</Link>
-              <button onClick={handleSignOut} className="mobile-sign-out-btn">Sign Out</button>
+              <button onClick={handleSignOut} className="mobile-sign-in-btn">Sign Out</button>
+              <button onClick={handleDashboardRedirect} className="mobile-sign-up-btn">Dashboard</button>
             </>
           ) : (
             <>
-              <Link href='/signin-doctor' className='mobile-sign-up-btn' onClick={() => setIsMenuOpen(false)}>Login As Doctor</Link>
-              <Link href='/signin' className='mobile-sign-in-btn' onClick={() => setIsMenuOpen(false)}>Login As Patient</Link>
+              <Link href='/signin-doctor' className='mobile-sign-in-btn' onClick={() => setIsMenuOpen(false)}>Login As Doctor</Link>
+              <Link href='/signin' className='mobile-sign-up-btn' onClick={() => setIsMenuOpen(false)}>Login As Patient</Link>
             </>
           )}
         </div>
