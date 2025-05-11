@@ -37,12 +37,7 @@ const Footer = () => {
             <li>
               <a href="/">Home</a>
             </li>
-            <li>
-              <a href="/about">About Us</a>
-            </li>
-            <li>
-              <a href="/services">Services</a>
-            </li>
+
             <li>
               <a href="/patient-dashboard">Patient Portal</a>
             </li>
@@ -59,21 +54,21 @@ const Footer = () => {
           <h3>Contact Us</h3>
           <p>
             <FaMapMarkerAlt />
-            123 Wellness Street, Health District
+           Chameli Devi Group Of Institutions, Indore, MP
           </p>
           <p>
             <FaPhone />
-            +1 (555) 123-4567
+           8770495344 , 9897705999
           </p>
           <p>
             <FaEnvelope />
-            contact@wellio.com
+           well.io0916@gmail.com
           </p>
         </div>
       </div>
 
       <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} Wellio Health. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Well.io Health. All rights reserved.</p>
       </div>
     </footer>
   );

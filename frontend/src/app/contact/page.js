@@ -56,7 +56,7 @@ export default function ContactPage() {
               </div>
               <div className="info-text">
                 <h3>Address</h3>
-                <p>123 Wellness Street<br />Health District, CA 90210</p>
+                <p>Chameli Devi Group Of Institutions<br />Indore, MP</p>
               </div>
             </div>
 
@@ -66,7 +66,8 @@ export default function ContactPage() {
               </div>
               <div className="info-text">
                 <h3>Phone</h3>
-                <p>+1 (555) 123-4567</p>
+                <p>8770495344</p>
+                <p>9897705999</p>
               </div>
             </div>
 
@@ -76,7 +77,7 @@ export default function ContactPage() {
               </div>
               <div className="info-text">
                 <h3>Email</h3>
-                <p>contact@welliohealth.com</p>
+                <p>well.io0916@gmail.com</p>
               </div>
             </div>
 
