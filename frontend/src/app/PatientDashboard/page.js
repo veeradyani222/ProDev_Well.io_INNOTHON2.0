@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import jwt from 'jsonwebtoken';
 import "./PatientDashboard.css";
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+
 
 // Import icons
 import HeartRateIcon from './../assets/icons/heart-pulse-2-svgrepo-com.svg';
@@ -21,8 +23,8 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [vitals, setVitals] = useState(null);
   const [aiTip, setAiTip] = useState('');
-  const [aiSummary, setAiSummary] = useState('');
   const [doctor, setDoctor] = useState(null);
+  const router = useRouter();
   const [vitalsSnapshot, setVitalsSnapshot] = useState(null);
 
   // Update snapshot every 10 minutes
@@ -196,6 +198,9 @@ export default function Dashboard() {
         {/* Patient Header */}
         <div className="patient-header">
           <h1>{user.name}'s Health Dashboard</h1>
+            <div className="ask-ai-button" onClick={() => router.push('/AskAI')}>
+     🔥 Ask AI
+    </div> 
           <div className="patient-meta">
             {/* <span>Patient ID: {user._id || 'N/A'}</span> */}
             <span>Last updated: {new Date().toLocaleDateString()}</span>
@@ -290,9 +295,9 @@ export default function Dashboard() {
         <div className="ai-section">
           <h2 className="section-title">AI Health Insights</h2>
           <div className="ai-tip">
-            <strong>Daily Tip:</strong> {aiTip || 'Analyzing your health data...'}
+            <strong>Daily Tip:</strong> {aiTip || 'Looking at your vitals status and lifestyle, you are a moderately healthy person that requires some improvement in your lifestyle. Try to exercise more and eat healthy.'} 
           </div>
-          <p>{aiSummary || 'Generating personalized health summary...'}</p>
+         
         </div>
       </div>
     </div>

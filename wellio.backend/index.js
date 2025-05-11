@@ -1151,6 +1151,85 @@ Provide your analysis in this exact format (keep each section concise but compre
     }
 });
 
+app.post('/api/health-question', async (req, res) => {
+    const { vitals, staticData, question } = req.body;
+
+    if (!vitals || !staticData || !question) {
+        return res.status(400).json({ error: 'Missing required patient data or question' });
+    }
+
+    try {
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+        // Calculate BMI
+        const bmi = (staticData.weight) / ((staticData.height / 100) ** 2).toFixed(1);
+
+        const prompt = ` 
+You are a medical AI assistant providing specific answers to a patient's health questions based on their data.
+The patient has asked: "${question}"
+
+Analyze the following patient data and provide a concise, professional answer (2-4 sentences) in plain text format:
+
+### Patient Background:
+- Age: ${staticData.age}
+- Gender: ${staticData.gender}
+- BMI: ${bmi} (${staticData.height}cm, ${staticData.weight}kg)
+- Blood Group: ${staticData.bloodGroup}
+
+### Medical Context:
+- Allergies: ${staticData.allergies || 'None reported'}
+- Current Medications: ${staticData.medications || 'None'}
+- Medical History: ${staticData.medicalHistory || 'None significant'}
+- Family History: ${staticData.familyHistory || 'None significant'}
+
+### Lifestyle Factors:
+- Activity Level: ${staticData.lifestyle}
+- Exercise: ${staticData.exercise}
+- Sleep: ${staticData.sleep}
+- Diet: ${staticData.diet}
+- Stress: ${staticData.stressLevel}
+- Habits: ${staticData.smoking}, ${staticData.alcohol}, ${staticData.caffeine}
+
+### Current Vitals:
+${Object.entries(vitals).map(([key, value]) => `- ${key}: ${value}`).join("\n")}
+
+Guidelines for your response:
+1. Directly address the patient's question first
+2. Reference specific data points when relevant
+3. Keep the tone professional but approachable
+4. If the question requires medical advice beyond your scope, recommend consulting their doctor
+5. For numerical values (BP, BMI, etc.), mention whether they're in normal range
+6. Limit response to 4 sentences maximum unless complex analysis is needed
+
+Response format (plain text only, no markdown or formatting):
+[Your direct answer to the question based on the data provided]
+`;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+
+        // Clean up the response
+        const cleanText = text.replace(/\*\*/g, '') // Remove any bold markers
+                             .replace(/^\s*[\n\r]+/gm, '') // Remove empty lines
+                             .trim();
+
+        return res.json({
+            success: true,
+            question,
+            answer: cleanText,
+            lastUpdated: new Date().toISOString()
+        });
+
+    } catch (error) {
+        console.error('Health question error:', error);
+        return res.status(500).json({
+            error: 'Failed to generate health answer',
+            details: error.message
+        });
+    }
+});
+
 app.listen(port, (error) => {
     if (!error) {
         console.log("Server is running on " + port);

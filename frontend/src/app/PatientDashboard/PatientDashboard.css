@@ -62,6 +62,33 @@ body {
   gap: 2rem;
 }
 
+
+.patient-header {
+  display: flex;
+  align-items: center; /* Aligns items vertically */
+  gap: 10px; /* Adds some space between the text and button */
+}
+
+.ask-ai-button {
+  background-color: #28a745;
+  color: white;
+  padding: 8px 16px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20vw;
+}
+
+.ask-ai-button:hover {
+  background-color: #218838;
+  transform: scale(1.05);
+}
+
+
 .patient-header {
   display: flex;
   justify-content: space-between;
@@ -152,6 +179,7 @@ body {
   color: var(--text-muted);
   margin-bottom: 0.25rem;
 }
+
 
 .vital-value {
   font-size: 1.5rem;
