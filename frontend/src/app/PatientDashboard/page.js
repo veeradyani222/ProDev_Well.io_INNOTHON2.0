@@ -41,7 +41,7 @@ export default function Dashboard() {
     const interval = setInterval(updateSnapshot, 10 * 60 * 1000); // every 10 minutes
 
     return () => clearInterval(interval);
-  }, [vitals]);
+  }, [user]);
 
   // Fetch user and vitals data on mount
   useEffect(() => {
