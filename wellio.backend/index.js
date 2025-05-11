@@ -936,7 +936,7 @@ function generateVitals() {
 // Cache for vitals data
 let cachedVitals = generateVitals();
 let lastUpdateTime = Date.now();
-const UPDATE_INTERVAL = 90 * 1000; // 1.5 minutes
+const UPDATE_INTERVAL = 90 * 1; // 1.5 minutes
 
 // API endpoint to get vitals
 app.get('/api/vitals', (req, res) => {
