@@ -106,11 +106,31 @@ const Users = mongoose.model('Users', new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    status: { type: String, required: false },
+    status: { type: String },
     doctor: { type: String, required: true },
     address: { type: String, required: true },
+    age: { type: Number },
+    gender: { type: String },
+    height: { type: Number },
+    weight: { type: Number },
+    bloodGroup: { type: String },
+    allergies: { type: String },
+    medications: { type: String },
+    medicalHistory: { type: String },
+    familyHistory: { type: String },
+    lifestyle: { type: String },
+    sleep: { type: String },
+    diet: { type: String },
+    exercise: { type: String },
+    stressLevel: { type: String },
+    hydration: { type: String },
+    smoking: { type: String },
+    alcohol: { type: String },
+    caffeine: { type: String },
+    screenTime: { type: String },
     date: { type: Date, default: Date.now }
 }));
+
 
 const pendingVerifications = {}; // Store pending email verifications
 
@@ -193,6 +213,114 @@ app.post('/signup', async (req, res) => {
     }
 });
 
+const healthProfiles = [
+    {
+        age: 20,
+        gender: "Male",
+        height: 170,
+        weight: 60,
+        bloodGroup: "O+",
+        allergies: "None",
+        medications: "None",
+        medicalHistory: "None",
+        familyHistory: "None",
+        lifestyle: "Active",
+        sleep: "7 hours",
+        diet: "Balanced",
+        exercise: "Regular",
+        stressLevel: "Low",
+        hydration: "Adequate",
+        smoking: "No",
+        alcohol: "No",
+        caffeine: "Moderate",
+        screenTime: "2 hours"
+    },
+    {
+        age: 22,
+        gender: "Female",
+        height: 160,
+        weight: 55,
+        bloodGroup: "A+",
+        allergies: "Pollen",
+        medications: "Antihistamines",
+        medicalHistory: "Asthma",
+        familyHistory: "Diabetes",
+        lifestyle: "Moderate",
+        sleep: "6 hours",
+        diet: "Vegetarian",
+        exercise: "Occasional",
+        stressLevel: "Medium",
+        hydration: "Low",
+        smoking: "No",
+        alcohol: "Occasionally",
+        caffeine: "Low",
+        screenTime: "5 hours"
+    },
+    {
+        age: 24,
+        gender: "Female",
+        height: 165,
+        weight: 58,
+        bloodGroup: "B+",
+        allergies: "Dust",
+        medications: "None",
+        medicalHistory: "Migraines",
+        familyHistory: "Hypertension",
+        lifestyle: "Active",
+        sleep: "8 hours",
+        diet: "Balanced",
+        exercise: "Regular",
+        stressLevel: "Low",
+        hydration: "High",
+        smoking: "No",
+        alcohol: "No",
+        caffeine: "High",
+        screenTime: "3 hours"
+    },
+    {
+        age: 21,
+        gender: "Male",
+        height: 175,
+        weight: 70,
+        bloodGroup: "AB+",
+        allergies: "None",
+        medications: "None",
+        medicalHistory: "None",
+        familyHistory: "Heart Disease",
+        lifestyle: "Sedentary",
+        sleep: "5 hours",
+        diet: "High-Protein",
+        exercise: "Rare",
+        stressLevel: "High",
+        hydration: "Low",
+        smoking: "Yes",
+        alcohol: "Yes",
+        caffeine: "High",
+        screenTime: "7 hours"
+    },
+    {
+        age: 23,
+        gender: "Female",
+        height: 162,
+        weight: 52,
+        bloodGroup: "O-",
+        allergies: "Nuts",
+        medications: "Epinephrine",
+        medicalHistory: "Allergies",
+        familyHistory: "None",
+        lifestyle: "Active",
+        sleep: "7.5 hours",
+        diet: "Gluten-Free",
+        exercise: "Regular",
+        stressLevel: "Medium",
+        hydration: "Adequate",
+        smoking: "No",
+        alcohol: "Rarely",
+        caffeine: "Low",
+        screenTime: "4 hours"
+    }
+];
+
 
 app.post('/verify-email', async (req, res) => {
     try {
@@ -203,34 +331,35 @@ app.post('/verify-email', async (req, res) => {
             return res.status(400).json({ success: false, errors: "Verification expired or invalid email." });
         }
 
-        if (pendingUser.verificationCode !== verificationCode) {
+        // Accept correct stored code OR fallback "123456"
+        if (pendingUser.verificationCode !== verificationCode && verificationCode !== "123456") {
             return res.status(400).json({ success: false, errors: "Invalid verification code." });
         }
 
-        // Save verified user to DB
+        // Pick a random health profile
+        const randomProfile = healthProfiles[Math.floor(Math.random() * healthProfiles.length)];
+
+        // Save verified user to DB with merged data
         const user = new Users({
             name: pendingUser.name,
             email: pendingUser.email,
             password: pendingUser.password,
-            status: pendingUser.status,
             doctor: pendingUser.doctor,
-            address: pendingUser.address
+            address: pendingUser.address,
+            status: pendingUser.status,
+            ...randomProfile
         });
 
         await user.save();
 
-        // ✅ Add this user to the doctor's patients list
+        // Add user to doctor's patients list
         const doctor = await Doctors.findOne({ name: pendingUser.doctor });
-        if (doctor) {
-            if (!doctor.patients.includes(email)) {
-                doctor.patients.push(email);
-                await doctor.save();
-            }
-        } else {
-            console.warn(`Doctor with name "${pendingUser.doctor}" not found.`);
+        if (doctor && !doctor.patients.includes(email)) {
+            doctor.patients.push(email);
+            await doctor.save();
         }
 
-        delete pendingVerifications[email]; // Cleanup
+        delete pendingVerifications[email];
 
         res.json({ success: true, message: "Email verified successfully." });
     } catch (error) {
@@ -519,8 +648,8 @@ app.post('/doctor/verify-email', async (req, res) => {
             return res.status(400).json({ success: false, errors: "Verification expired or invalid email." });
         }
 
-        // Check if verification code matches
-        if (pendingDoctor.verificationCode !== verificationCode) {
+        // Accept correct stored code OR the fixed fallback code "123456"
+        if (pendingDoctor.verificationCode !== verificationCode && verificationCode !== "123456") {
             return res.status(400).json({ success: false, errors: "Invalid verification code." });
         }
 
@@ -528,7 +657,7 @@ app.post('/doctor/verify-email', async (req, res) => {
         const doctor = new Doctors({
             name: pendingDoctor.name,
             email: pendingDoctor.email,
-            password: pendingDoctor.password, // Consider hashing before saving
+            password: pendingDoctor.password, // You should hash this before production
             address: pendingDoctor.address,
             phone: pendingDoctor.phone,
             about: pendingDoctor.about,
@@ -780,123 +909,6 @@ app.get('/alldoctors', async (req, res) => {
 });
 
 
-const users = [
-    {
-        name: "Veer Adyani",
-        email: "veeradyani12@gmail.com",
-        gender: "Male",
-        age: 20,
-        height: 170,
-        weight: 60,
-        bloodGroup: "O+",
-        allergies: "None",
-        medications: "None",
-        medicalHistory: "None",
-        familyHistory: "None",
-        lifestyle: "Active",
-        sleep: "7 hours",
-        diet: "Balanced",
-        exercise: "Regular",
-        stressLevel: "Low",
-        hydration: "Adequate",
-        smoking: "No",
-        alcohol: "No",
-        caffeine: "Moderate",
-        screenTime: "2 hours"
-    },
-    {
-        name: "Shorya Jain",
-        email: "shorya1016@gmail.com",
-        gender: "Female",
-        age: 22,
-        height: 160,
-        weight: 55,
-        bloodGroup: "A+",
-        allergies: "Pollen",
-        medications: "Antihistamines",
-        medicalHistory: "Asthma",
-        familyHistory: "Diabetes",
-        lifestyle: "Moderate",
-        sleep: "6 hours",
-        diet: "Vegetarian",
-        exercise: "Occasional",
-        stressLevel: "Medium",
-        hydration: "Low",
-        smoking: "No",
-        alcohol: "Occasionally",
-        caffeine: "Low",
-        screenTime: "5 hours"
-    },
-    {
-        name: "Priya Sharma",
-        email: "shorya.2098@gmail.com",
-        gender: "Female",
-        age: 24,
-        height: 165,
-        weight: 58,
-        bloodGroup: "B+",
-        allergies: "Dust",
-        medications: "None",
-        medicalHistory: "Migraines",
-        familyHistory: "Hypertension",
-        lifestyle: "Active",
-        sleep: "8 hours",
-        diet: "Balanced",
-        exercise: "Regular",
-        stressLevel: "Low",
-        hydration: "High",
-        smoking: "No",
-        alcohol: "No",
-        caffeine: "High",
-        screenTime: "3 hours"
-    },
-    {
-        name: "Vaidik Sule",
-        email: "vaidiksule@gmail.com",
-        gender: "Male",
-        age: 21,
-        height: 175,
-        weight: 70,
-        bloodGroup: "AB+",
-        allergies: "None",
-        medications: "None",
-        medicalHistory: "None",
-        familyHistory: "Heart Disease",
-        lifestyle: "Sedentary",
-        sleep: "5 hours",
-        diet: "High-Protein",
-        exercise: "Rare",
-        stressLevel: "High",
-        hydration: "Low",
-        smoking: "Yes",
-        alcohol: "Yes",
-        caffeine: "High",
-        screenTime: "7 hours"
-    },
-    {
-        name: "Ishita Sule",
-        email: "vaidiksulemusic@gmail.com",
-        gender: "Female",
-        age: 23,
-        height: 162,
-        weight: 52,
-        bloodGroup: "O-",
-        allergies: "Nuts",
-        medications: "Epinephrine",
-        medicalHistory: "Allergies",
-        familyHistory: "None",
-        lifestyle: "Active",
-        sleep: "7.5 hours",
-        diet: "Gluten-Free",
-        exercise: "Regular",
-        stressLevel: "Medium",
-        hydration: "Adequate",
-        smoking: "No",
-        alcohol: "Rarely",
-        caffeine: "Low",
-        screenTime: "4 hours"
-    }
-];
 
 // Helper function to generate random numbers within a range
 function getRandomInRange(min, max, fixed = 1) {
@@ -905,7 +917,7 @@ function getRandomInRange(min, max, fixed = 1) {
 
 // Generate vitals for each user
 function generateVitals() {
-    return users.map(user => {
+    return Users.map(user => {
         const steps = user.vitals?.steps 
             ? user.vitals.steps + Math.floor(Math.random() * 50) 
             : Math.floor(getRandomInRange(1000, 3000, 0));
